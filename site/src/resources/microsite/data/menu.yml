@@ -1,9 +1,13 @@
 options:
-  - title: Core
-    url: core/
-    menu_section: core
+  - title: Documentation
+    url: docs/
+    menu_section: docs
 
     nested_options:
-      - title: Example
-        url: core/example.html
-        menu_section: example
+      - title: Motivation
+        url: docs/motivation.html
+        menu_section: docs
+
+      - title: Defining Newtypes
+        url: docs/core.html
+        menu_section: docs

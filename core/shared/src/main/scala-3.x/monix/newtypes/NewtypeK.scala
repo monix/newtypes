@@ -15,22 +15,30 @@
  * limitations under the License.
  */
 
-package io.monix.newtypes
+package monix.newtypes
 
-import cats._
-import cats.implicits._
+/** $newtypeKDescription */
+abstract class NewtypeK[Src[_]] {
+  opaque type Type[A] = Src[A]
 
-object Example {
-  /**
-    * Example function.
-    *
-    * Usage:
-    * {{{
-    *   import cats.implicits._
-    *
-    *   Example.sumAll(List(1, 2, 3, 4))
-    * }}}
-    */
-  def sumAll[F[_]: Traverse, A: Monoid](list: F[A]): A =
-    list.foldLeft(Monoid[A].empty)(Monoid[A].combine)
+  // TODO: add inline after when this PR ships in Scala compiler
+  // https://github.com/lampepfl/dotty/pull/12815
+
+  extension [A](self: Type[A]) {
+    def value: Src[A] = self
+  }
+
+  protected def unsafeCoerce[A](value: Src[A]): Type[A] =
+    value
+
+  protected final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =
+    ev
+
+  protected final def deriveK[F[_[_]]](using ev: F[Src]): F[Type] =
+    ev
+}
+
+/** $newtypeCovariantKDescription */
+abstract class NewtypeCovariantK[Src[+_]] extends NewtypeK[Src] {
+  override opaque type Type[+A] = Src[A]
 }

@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-package io.monix.newtypes
+package monix.newtypes
 
-import cats.implicits._
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatestplus.scalacheck.Checkers
+/** $newtypeBaseDescription */
+abstract class Newtype[Src] extends CoreScalaDoc { companion =>
+  type Base = Any { type NewType$base }
+  trait Tag extends Any
+  type Type <: Base with Tag
 
-class ExampleSuite extends AnyFunSuite with Checkers {
+  @inline final def value(x: Type): Src =
+    x.asInstanceOf[Src]
 
-  test("sample test") {
-    val sum = Example.sumAll(List(1, 2, 3, 4))
-    assert(sum == 1 + 2 + 3 + 4)
+  implicit final class Ops(val self: Type) {
+    @inline def value: Src = companion.value(self)
   }
 
-  // Property-based testing via ScalaCheck
-  test("sum up any list") {
-    check { (l: List[Int]) =>
-      Example.sumAll(l) == l.sum
-    }
-  }
+  @inline protected final def unsafeCoerce(value: Src): Type =
+    value.asInstanceOf[Type]
+
+  @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
+    ev.asInstanceOf[F[Type]]
 }

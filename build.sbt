@@ -12,51 +12,19 @@ lazy val aggregatorIDs = Seq("core")
 
 addCommandAlias("ci-jvm",     ";" + aggregatorIDs.map(id => s"${id}JVM/clean ;${id}JVM/Test/compile ;${id}JVM/test").mkString(";"))
 addCommandAlias("ci-js",      ";" + aggregatorIDs.map(id => s"${id}JS/clean ;${id}JS/Test/compile ;${id}JS/test").mkString(";"))
-addCommandAlias("ci-package", ";scalafmtCheckAll ;package")
 addCommandAlias("ci-doc",     ";unidoc ;site/makeMicrosite")
-addCommandAlias("ci",         ";project root ;reload ;+scalafmtCheckAll ;+ci-jvm ;+ci-js ;+package ;ci-doc")
+addCommandAlias("ci",         ";project root ;reload ;+ci-jvm ;+ci-js ;+package ;ci-doc")
 addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosite")
 
 // ---------------------------------------------------------------------------
-// Dependencies
+// Versions
 
-/** Standard FP library for Scala:
-  * [[https://typelevel.org/cats/]]
-  */
-val CatsVersion = "2.6.1"
+val catsVersion        = "2.6.1"
+val scalaTestVersion   = "3.2.9"
+val shapeless2xVersion = "2.3.3"
+val shapeless3xVersion = "3.0.2"
 
-/** FP library for describing side-effects:
-  * [[https://typelevel.org/cats-effect/]]
-  */
-val CatsEffectVersion = "3.2.4"
-
-/** Library for unit-testing:
-  * [[https://github.com/monix/minitest/]]
-  *  - [[https://github.com/scalatest/scalatest]]
-  *  - [[https://github.com/scalatest/scalatestplus-scalacheck/]]
-  */
-val ScalaTestVersion = "3.2.9"
-val ScalaTestPlusVersion = "3.2.9.0"
-
-/** Library for property-based testing:
-  * [[https://www.scalacheck.org/]]
-  */
-val ScalaCheckVersion = "1.15.4"
-
-/** Compiler plugin for working with partially applied types:
-  * [[https://github.com/typelevel/kind-projector]]
-  */
-val KindProjectorVersion = "0.13.1"
-
-/** Compiler plugin for fixing "for comprehensions" to do desugaring w/o `withFilter`:
-  * [[https://github.com/typelevel/kind-projector]]
-  */
-val BetterMonadicForVersion = "0.3.1"
-
-/** Used for publishing the microsite:
-  * [[https://github.com/47degrees/github4s]]
-  */
-val GitHub4sVersion = "0.29.1"
+// ---------------------------------------------------------------------------
 
 /**
   * Defines common plugins between all projects.
@@ -80,7 +48,7 @@ lazy val sharedSettings = Seq(
 
   organization := "io.monix",
   scalaVersion := "2.13.6",
-  crossScalaVersions := Seq("2.12.12", "2.13.6", "3.0.1"),
+  crossScalaVersions := Seq("2.12.14", "2.13.6", "3.0.1"),
 
   // Turning off fatal warnings for doc generation
   Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
@@ -92,17 +60,6 @@ lazy val sharedSettings = Seq(
     "-Ywarn-value-discard",
     "-Wvalue-discard",
   ))),
-
-  // Compiler plugins that aren't necessarily compatible with Scala 3
-  libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, _)) =>
-      Seq(
-        compilerPlugin("com.olegpy" %% "better-monadic-for" % BetterMonadicForVersion),
-        compilerPlugin("org.typelevel" % "kind-projector" % KindProjectorVersion cross CrossVersion.full),
-      )
-    case _ =>
-      Seq.empty
-  }),
 
   // ScalaDoc settings
   autoAPIMappings := true,
@@ -214,7 +171,6 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
   pr.configure(defaultPlugins)
     .settings(sharedSettings)
     .jsSettings(sharedJavascriptSettings)
-    .jvmSettings(doctestTestSettings(DoctestTestFramework.ScalaTest))
     .jvmSettings(sharedJVMSettings)
     .settings(crossVersionSharedSources)
     .settings(filterOutMultipleDependenciesFromGeneratedPomXml(
@@ -274,7 +230,8 @@ lazy val site = project.in(file("site"))
         "gray-lighter" -> "#F4F3F4",
         "white-color" -> "#FFFFFF"
       ),
-      libraryDependencies += "com.47deg" %% "github4s" % GitHub4sVersion,
+      // https://github.com/47degrees/github4s
+      libraryDependencies += "com.47deg" %% "github4s" % "0.29.1",
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
       micrositeExtraMdFilesOutput := (Compile / resourceManaged).value / "jekyll",
@@ -283,16 +240,17 @@ lazy val site = project.in(file("site"))
       ),
       micrositeExtraMdFiles := Map(
         file("README.md") -> ExtraMdFileConfig("index.md", "page", Map("title" -> "Home", "section" -> "home", "position" -> "100")),
-        file("CHANGELOG.md") -> ExtraMdFileConfig("CHANGELOG.md", "page", Map("title" -> "Change Log", "section" -> "changelog", "position" -> "101")),
-        file("CONTRIBUTING.md") -> ExtraMdFileConfig("CONTRIBUTING.md", "page", Map("title" -> "Contributing", "section" -> "contributing", "position" -> "102")),
-        file("CODE_OF_CONDUCT.md") -> ExtraMdFileConfig("CODE_OF_CONDUCT.md", "page", Map("title" -> "Code of Conduct", "section" -> "code of conduct", "position" -> "103")),
-        file("LICENSE.md") -> ExtraMdFileConfig("LICENSE.md", "page", Map("title" -> "License", "section" -> "license", "position" -> "104")),
+        file("CHANGELOG.md") -> ExtraMdFileConfig("CHANGELOG.md", "page", Map("title" -> "Change Log", "section" -> "changelog", "position" -> "110")),
+        file("CONTRIBUTING.md") -> ExtraMdFileConfig("CONTRIBUTING.md", "page", Map("title" -> "Contributing", "section" -> "contributing", "position" -> "120")),
+        file("CODE_OF_CONDUCT.md") -> ExtraMdFileConfig("CODE_OF_CONDUCT.md", "page", Map("title" -> "Code of Conduct", "section" -> "code of conduct", "position" -> "130")),
+        file("LICENSE.md") -> ExtraMdFileConfig("LICENSE.md", "page", Map("title" -> "License", "section" -> "license", "position" -> "140")),
       ),
       docsMappingsAPIDir := s"api",
       addMappingsToSiteDir(root / ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
       Compile / sourceDirectory := baseDirectory.value / "src",
       Test / sourceDirectory := baseDirectory.value / "test",
       mdocIn := (Compile / sourceDirectory).value / "mdoc",
+      scalacOptions ~= filterConsoleScalacOptions,
 
       Compile / run := {
         import scala.sys.process._
@@ -315,15 +273,28 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "newtypes-core",
     libraryDependencies ++= Seq(
-      "org.typelevel"  %%% "cats-core"        % CatsVersion,
-      "org.typelevel"  %%% "cats-effect"      % CatsEffectVersion,
-      // For testing
-      "org.scalatest"     %%% "scalatest"        % ScalaTestVersion % Test,
-      "org.scalatestplus" %%% "scalacheck-1-15"  % ScalaTestPlusVersion % Test,
-      "org.scalacheck"    %%% "scalacheck"       % ScalaCheckVersion % Test,
-      "org.typelevel"     %%% "cats-laws"        % CatsVersion % Test,
-      "org.typelevel"     %%% "cats-effect-laws" % CatsEffectVersion % Test,
+      // https://typelevel.org/cats/
+      "org.typelevel" %%% "cats-core" % catsVersion % Test,
+      // https://github.com/scalatest/scalatest
+      "org.scalatest" %%% "scalatest" % scalaTestVersion % Test,
     ),
+    // Version specific dependencies
+    libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, _)) =>
+        Seq(
+          // https://github.com/milessabin/shapeless
+          "com.chuusai" %% "shapeless" % shapeless2xVersion % Test,
+        )
+      case _ =>
+        Seq(
+          // https://github.com/typelevel/shapeless-3
+          "org.typelevel" %% "shapeless3-test" % shapeless3xVersion % Test
+        )
+    }),
+    // Activates doc testing
+    doctestTestFramework := DoctestTestFramework.ScalaTest,
+    doctestScalaTestVersion := Some(scalaTestVersion),
+    doctestOnlyCodeBlocksMode := true,
   )
 
 lazy val coreJVM = core.jvm

@@ -1,2 +1,4 @@
+api_baseurl: /api
+
 plugins:
   - jekyll-relative-links

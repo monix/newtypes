@@ -1,7 +1,5 @@
 import BuildKeys._
 
-import com.github.tkawachi.doctest.DoctestPlugin.DoctestTestFramework
-import com.github.tkawachi.doctest.DoctestPlugin.autoImport._
 import sbt._
 import sbt.Keys._
 import sbtunidoc.BaseUnidocPlugin.autoImport.{unidoc, unidocProjectFilter}
@@ -59,7 +57,7 @@ object Boilerplate {
 
   /**
     * For working with Scala version-specific source files, allowing us to
-    * use 2.12 or 2.13 specific APIs.
+    * use 2.x specific APIs.
     */
   lazy val crossVersionSharedSources: Seq[Setting[_]] = {
     def scalaPartV = Def setting (CrossVersion partialVersion scalaVersion.value)
@@ -68,24 +66,9 @@ object Boilerplate {
         (sc / unmanagedSourceDirectories).value.flatMap { dir =>
           Seq(
             scalaPartV.value match {
-              case Some((2, y)) if y == 11 => Seq(new File(dir.getPath + "-2.11"))
-              case Some((2, y)) if y == 12 => Seq(new File(dir.getPath + "-2.12"))
-              case Some((2, y)) if y == 13 => Seq(new File(dir.getPath + "-2.13"))
-              case _                       => Nil
-            },
-
-            scalaPartV.value match {
-              case Some((2, n)) if n > 12  => Seq(new File(dir.getPath + "-2.12+"))
-              case Some((2, n)) if n == 12 => Seq(new File(dir.getPath + "-2.12+"), new File(dir.getPath + "-2.12-"))
-              case Some((2, n)) if n < 12  => Seq(new File(dir.getPath + "-2.12-"))
-              case _                       => Nil
-            },
-
-            scalaPartV.value match {
-              case Some((2, n)) if n > 13  => Seq(new File(dir.getPath + "-2.13+"))
-              case Some((2, n)) if n == 13 => Seq(new File(dir.getPath + "-2.13+"), new File(dir.getPath + "-2.13-"))
-              case Some((2, n)) if n < 13  => Seq(new File(dir.getPath + "-2.13-"))
-              case _                       => Nil
+              case Some((2, _)) => Seq(new File(dir.getPath + s"-2.x"))
+              case Some((3, _)) => Seq(new File(dir.getPath + s"-3.x"))
+              case _ => Nil
             },
           ).flatten
         }
@@ -123,14 +106,5 @@ object Boilerplate {
       Seq("-doc-root-content", file("rootdoc.txt").getAbsolutePath),
     ScalaUnidoc / unidoc / scalacOptions ++=
       Opts.doc.version(version.value)
-  )
-
-  /**
-    * Settings for `sbt-doctest`, for unit testing ScalaDoc.
-    */
-  def doctestTestSettings(tf: DoctestTestFramework) = Seq(
-    doctestTestFramework := tf,
-    doctestIgnoreRegex := Some(s".*(internal).*"),
-    doctestOnlyCodeBlocksMode := true
   )
 }

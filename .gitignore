@@ -19,3 +19,5 @@ project/metals.sbt
 .bsp
 site/Gemfile.lock
 node_modules/
+project/project
+.history
