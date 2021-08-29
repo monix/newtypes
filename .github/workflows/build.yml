@@ -1,0 +1,195 @@
+name: build
+
+on:
+  pull_request:
+    branches: ['*']
+  push:
+    branches: ['*']
+    tags: ["v[0-9]+*"]
+
+jobs:
+  jvm-tests:
+    name: JVM (scala ${{ matrix.scala }}, jvm ${{ matrix.java }})
+    strategy:
+      fail-fast: true      
+      matrix:
+        os: [ubuntu-20.04]
+        java: [8, 11]
+        scala: [2.12.12, 2.13.6, 3.0.1]
+        command: ["ci-jvm"]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v11
+        with:
+          java-version: "adopt@1.${{ matrix.java }}"
+
+      - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
+        run: |
+          ./.github/scripts/build.sh
+        env:
+          SCALA_VERSION: ${{ matrix.scala }}
+          SBT_COMMAND: ${{ matrix.command }}
+
+  js-tests:
+    name: JS (scala ${{ matrix.scala }}, scala.js ${{ matrix.scalajs }}, jvm ${{ matrix.java }})
+    strategy:
+      fail-fast: true      
+      matrix:
+        os: [ubuntu-20.04]
+        java: [11]
+        scala: [2.12.12, 2.13.6, 3.0.1]
+        scalajs: [1.7.0]
+        command: [ci-js]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v11
+        with:
+          java-version: "adopt@1.${{ matrix.java }}"
+
+      - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
+        run: |
+          ./.github/scripts/build.sh
+        env:
+          SCALA_VERSION: ${{ matrix.scala }}
+          SCALAJS_VERSION: ${{ matrix.scalaJS }}
+          SBT_COMMAND: ${{ matrix.command }}
+
+  package-tests:
+    name: Package (scala ${{ matrix.scala }}, scala.js ${{ matrix.scalajs }}, jvm ${{ matrix.java }})
+    strategy:
+      fail-fast: true      
+      matrix:
+        os: [ubuntu-20.04]
+        java: [11]
+        scala: [2.12.12, 2.13.6, 3.0.1]
+        scalajs: [1.7.0]
+        command: [ci-package]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v11
+        with:
+          java-version: "adopt@1.${{ matrix.java }}"
+
+      - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
+        run: |
+          ./.github/scripts/build.sh
+        env:
+          SCALA_VERSION: ${{ matrix.scala }}
+          SCALAJS_VERSION: ${{ matrix.scalaJS }}
+          SBT_COMMAND: ${{ matrix.command }}
+
+  doc-tests:
+    name: Docs (scala ${{ matrix.scala }}, scala.js ${{ matrix.scalajs }}, jvm ${{ matrix.java }})
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-20.04]
+        java: [11]
+        scala: [2.13.6]
+        scalajs: [1.7.0]
+        command: ["ci-doc"]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v11
+        with:
+          java-version: "adopt@1.${{ matrix.java }}"
+
+      - name: Set up Ruby 2.7 (for microsite)
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.x
+
+      - name: Install microsite dependencies
+        run: |
+          bundle install --system --gemfile=site/Gemfile
+
+      - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
+        run: |
+          ./.github/scripts/build.sh
+        env:
+          SCALA_VERSION: ${{ matrix.scala }}
+          SCALAJS_VERSION: ${{ matrix.scalaJS }}
+          SBT_COMMAND: ${{ matrix.command }}
+
+  #-----------------------------------------------------------------------------------
+  # Publishing tasks
+  #-----------------------------------------------------------------------------------
+
+  publish_sonatype:
+    name: Publish to Sonatype
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [ jvm-tests, js-tests, package-tests, doc-tests ]
+    strategy:
+      fail-fast: true      
+      max-parallel: 1
+      matrix:
+        scalajs: ["", 1.7.0]
+        command: [ci-release]
+
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v11
+        with:
+          java-version: "adopt@1.8"
+
+      - name: Install GnuPG2
+        run: |
+          sudo apt-get update && sudo apt-get -y install gnupg2
+          mkdir ~/.gnupg && chmod 700 ~/.gnupg
+          echo use-agent >> ~/.gnupg/gpg.conf
+          echo pinentry-mode loopback >> ~/.gnupg/gpg.conf
+          echo allow-loopback-pinentry >> ~/.gnupg/gpg-agent.conf
+          chmod 600 ~/.gnupg/*
+          echo RELOADAGENT | gpg-connect-agent
+          echo $PGP_SECRET | base64 --decode | gpg --import --no-tty --batch --yes
+        env:
+          PGP_SECRET: ${{secrets.PGP_SECRET}}
+
+      - name: SCALAJS_VERSION=${{ matrix.scalajs }} sbt ci-release
+        run: |
+          echo "SCALAJS_VERSION=$SCALAJS_VERSION"
+          sbt +clean ci-release
+        env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SCALAJS_VERSION: ${{ matrix.scalaJS }}
+
+  publish_microsite:
+    name: Publish Website
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [ publish_sonatype ]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: olafurpg/setup-scala@v11
+        with:
+          java-version: "adopt@1.8"
+
+      - name: Set up Ruby 2.7 (for microsite)
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.x
+
+      - name: Install microsite dependencies
+        run: |
+          bundle install --system --gemfile=site/Gemfile
+
+      - name: Publish Website
+        run: sbt +clean site/publishMicrosite
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
