@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><title>Newtypes: Contributing</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="The Monix Developers" /><meta name="description" content="Macro-free helpers for defining newtypes in Scala." /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="Newtypes: Contributing" /><meta name="title" property="og:title" content="Newtypes: Contributing" /><meta name="og:site_name" content="Newtypes" /><meta name="og:url" content="https://newtypes.monix.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Macro-free helpers for defining newtypes in Scala." /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="Newtypes: Contributing" /><meta name="twitter:image" content="https://newtypes.monix.io/img/poster.png" /><meta name="twitter:description" content="Macro-free helpers for defining newtypes in Scala." /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:creator" content="@monix" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/css/light-style.css" /></head><body class="page"><nav id="navigation" aria-labelledby="main-navigation"><div class="navbar-wrapper container"><div class="navigation-brand"><a href="/" class="brand background-mask"><div class="page-icon-wrapper"></div><span class="brand-title">Newtypes</span></a></div><div class="navigation-menu"><ul><li class="search-nav"><div id="search-dropdown"><label><i class="fa fa-search"></i>Search</label><input id="search-bar" type="text" placeholder="Enter keywords here..." onclick="displayToggleSearch(event)" /><ul id="search-dropdown-content" class="dropdown dropdown-content"></ul></div></li><li><a href="https://github.com/monix/newtypes" target="_blank" rel="noopener noreferrer"><i class="nav-item-icon fa fa-lg fa-github" hidden="true"></i><span class="nav-item-text">GitHub</span></a></li><li><a href="https://newtypes.monix.io/api/"><i class="nav-item-icon fa fa-lg fa-file-text" hidden="true"></i><span class="nav-item-text">Documentation</span></a></li></ul></div></div></nav><nav class="menu-container" aria-labelledby="section-navigation"><div id="horizontal-menu"><ul class="horizontal-nav"><li><a class="" href="/">Home</a></li><li><a class="" href="/docs/">Documentation</a></li><li><a class="" href="/CHANGELOG.html">Change Log</a></li><li><a class=" active " href="/CONTRIBUTING.html">Contributing</a></li><li><a class="" href="/CODE_OF_CONDUCT.html">Code of Conduct</a></li><li><a class="" href="/LICENSE.html">License</a></li></ul></div></nav><main id="site-main" class="page-site-main"><section class="use"><div class="container"><div id="content"><h1 id="contributing-to-newtypes">Contributing to Newtypes</h1>
+
+<p>The Newtypes project welcomes contributions from anybody wishing to participate. All code or documentation that is provided must be licensed with the same license that Newtypes is licensed with (Apache 2.0, see <a href="/LICENSE.html">LICENSE</a>).</p>
+
+<h2 id="code-of-conduct">Code of Conduct</h2>
+
+<p>People are expected to follow the <a href="/CODE_OF_CONDUCT.html">Scala Code of Conduct</a> when discussing Newtypes on the Github page, Gitter channel, or other venues.</p>
+
+<p>We hope that our community will be respectful, helpful, and kind. If you find yourself embroiled in a situation that becomes heated, or that fails to live up to our expectations, you should disengage and contact one of the project maintainers in private. We hope to avoid letting minor aggressions and misunderstandings escalate into larger problems.</p>
+
+<h2 id="general-workflow">General Workflow</h2>
+
+<ol>
+  <li>
+    <p>Make sure you can license your work under Apache 2.0</p>
+  </li>
+  <li>
+    <p>Before starting to work, make sure there is a ticket in the issue or create one first. It can help accelerate the acceptance process if the change is agreed upon</p>
+  </li>
+  <li>
+    <p>If you don’t have write access to the repository, you should do your work in a local branch of your own fork and then submit a pull request. If you do have write access to the repository, never work directly on the <code class="language-plaintext highlighter-rouge">main</code> branch.</p>
+  </li>
+  <li>
+    <p>Submit a Pull Request.</p>
+  </li>
+  <li>
+    <p>Anyone can comment on a pull request and you are expected to answer questions or to incorporate feedback.</p>
+  </li>
+  <li>
+    <p>It is not allowed to force push to the branch on which the pull request is based.</p>
+  </li>
+</ol>
+
+<h2 id="general-guidelines">General Guidelines</h2>
+
+<ol>
+  <li>
+    <p>It is recommended that the work is accompanied by unit tests.</p>
+  </li>
+  <li>
+    <p>The commit messages should be clear and short one lines, if more details are needed, specify a body.</p>
+  </li>
+  <li>
+    <p>New source files should be accompanied by the copyright header (should be taken care of automatically by the build tool, but do check).</p>
+  </li>
+  <li>
+    <p>Follow the structure of the code in this repository and the indentation rules used.</p>
+  </li>
+  <li>
+    <p>Your first commit request should be accompanied with a change to the AUTHORS file, adding yourself to the authors list.</p>
+  </li>
+</ol>
+
+<h2 id="license">License</h2>
+
+<p>All code must be licensed under the Apache 2.0 license and all files must include the following copyright header:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Copyright (c) $today.year the Newtypes contributors.
+See the project homepage at: https://newtypes.monix.io/
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre></div></div>
+
+</div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><p>Newtypes is designed and developed by <a href="https://newtypes.monix.io/" target="_blank" rel="noopener noreferrer">The Monix Developers</a></p></div></div></footer><script src="/highlight/highlight.pack.js"></script><script src="/lunr/lunr.js"></script><script>
+// For all code blocks, copy the language from the containing div
+// to the inner code tag (where hljs expects it to be)
+const langPrefix = 'language-';
+document.querySelectorAll(`div[class^='${langPrefix}']`).forEach(function(div) {
+  div.classList.forEach(function(cssClass) {
+    if (cssClass.startsWith(langPrefix)) {
+      const lang = cssClass.substring(langPrefix.length);
+      div.querySelectorAll('pre code').forEach(function(code) {
+        code.classList.add(lang);
+      });
+    }
+  });
+});
+
+hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlightingOnLoad();
+      </script><script>console.info('\x57\x65\x62\x73\x69\x74\x65\x20\x62\x75\x69\x6c\x74\x20\x77\x69\x74\x68\x3a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x5f\x5f\x0a\x20\x20\x20\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x5f\x20\x20\x2f\x20\x2f\x5f\x20\x20\x20\x20\x20\x20\x5f\x5f\x5f\x5f\x20\x5f\x5f\x5f\x20\x20\x28\x5f\x29\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x28\x5f\x29\x20\x2f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x0a\x20\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x60\x5f\x5f\x20\x5c\x2f\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x20\x2f\x20\x5f\x5f\x2f\x20\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x0a\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x5f\x2f\x20\x2f\x20\x2f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x5f\x5f\x2f\x20\x2f\x20\x20\x2f\x20\x2f\x5f\x2f\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x20\x2f\x5f\x2f\x20\x20\x5f\x5f\x28\x5f\x5f\x20\x20\x29\x0a\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2e\x5f\x5f\x5f\x2f\x5c\x5f\x5f\x2f\x20\x20\x20\x20\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x2f\x20\x20\x20\x5c\x5f\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x0a\x0a\x68\x74\x74\x70\x73\x3a\x2f\x2f\x34\x37\x64\x65\x67\x2e\x67\x69\x74\x68\x75\x62\x2e\x69\x6f\x2f\x73\x62\x74\x2d\x6d\x69\x63\x72\x6f\x73\x69\x74\x65\x73')</script><script>((window.gitter = {}).chat = {}).options = {
+room: 'monix/monix'};</script><script src="https://sidecar.gitter.im/dist/sidecar.v1.js"></script><script src="/js/version-selector.js"></script><script src="/js/search.js"></script></body></html>
