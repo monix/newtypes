@@ -19,10 +19,14 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Versions
 
-val catsVersion        = "2.6.1"
-val scalaTestVersion   = "3.2.9"
-val shapeless2xVersion = "2.3.3"
-val shapeless3xVersion = "3.0.2"
+val Scala212 = "2.12.14"
+val Scala213 = "2.13.6"
+val Scala3   = "3.0.2"
+
+val CatsVersion        = "2.6.1"
+val ScalaTestVersion   = "3.2.9"
+val Shapeless2xVersion = "2.3.3"
+val Shapeless3xVersion = "3.0.2"
 
 // ---------------------------------------------------------------------------
 
@@ -47,8 +51,8 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "newtypes",
 
   organization := "io.monix",
-  scalaVersion := "2.13.6",
-  crossScalaVersions := Seq("2.12.14", "2.13.6", "3.0.1"),
+  scalaVersion := Scala213,
+  crossScalaVersions := Seq(Scala212, Scala213, Scala3),
 
   // Turning off fatal warnings for doc generation
   Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
@@ -274,26 +278,26 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     name := "newtypes-core",
     libraryDependencies ++= Seq(
       // https://typelevel.org/cats/
-      "org.typelevel" %%% "cats-core" % catsVersion % Test,
+      "org.typelevel" %%% "cats-core" % CatsVersion % Test,
       // https://github.com/scalatest/scalatest
-      "org.scalatest" %%% "scalatest" % scalaTestVersion % Test,
+      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
     ),
     // Version specific dependencies
     libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, _)) =>
         Seq(
           // https://github.com/milessabin/shapeless
-          "com.chuusai" %% "shapeless" % shapeless2xVersion % Test,
+          "com.chuusai" %% "shapeless" % Shapeless2xVersion % Test,
         )
       case _ =>
         Seq(
           // https://github.com/typelevel/shapeless-3
-          "org.typelevel" %% "shapeless3-test" % shapeless3xVersion % Test
+          "org.typelevel" %% "shapeless3-test" % Shapeless3xVersion % Test
         )
     }),
     // Activates doc testing
     doctestTestFramework := DoctestTestFramework.ScalaTest,
-    doctestScalaTestVersion := Some(scalaTestVersion),
+    doctestScalaTestVersion := Some(ScalaTestVersion),
     doctestOnlyCodeBlocksMode := true,
   )
 

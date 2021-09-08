@@ -31,7 +31,7 @@ type EmailAddress = EmailAddress.Type
 object EmailAddress extends Newtype[String] {
   def apply(value: String): Option[EmailAddress] =
     if (value.contains("@"))
-      Some(unsafeCoerce(value))
+      Some(unsafeBuild(value))
     else
       None
 
@@ -123,7 +123,7 @@ type EmailAddress = EmailAddress.Type
 object EmailAddress extends NewtypeValidated[String, Exception] {
   def apply(v: String): Either[Exception, EmailAddress] =
     if (v.contains("@")) 
-      Right(unsafeCoerce(v))
+      Right(unsafeBuild(v))
     else 
       Left(new IllegalArgumentException("Not a valid email"))
 }
@@ -221,7 +221,7 @@ type NonEmptyList[A] = NonEmptyList.Type[A]
 object NonEmptyList extends NewtypeCovariantK[List] {
   // Builder forces at least one element
   def apply[A](head: A, tail: A*): NonEmptyList[A] =
-    unsafeCoerce(head :: tail.toList)
+    unsafeBuild(head :: tail.toList)
 
   // Exposes (head, tail)
   def unapply[F[_], A](list: F[A])(
