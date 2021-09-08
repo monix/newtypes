@@ -33,7 +33,7 @@ class NewsubtypeValidatedSuite extends AnyFunSuite {
     }
 
     EmailAddress("not a valid email") match {
-      case Left(_: IllegalArgumentException) => succeed
+      case Left(BuildFailure(_, _, _)) => succeed
       case other => fail(s"Unexpected value: $other")
     }
   }
@@ -72,10 +72,10 @@ object NewsubtypeValidatedSuite {
   type EmailAddress = EmailAddress.Type
 
   object EmailAddress extends NewsubtypeValidated[String, Exception] {
-    def apply(v: String): Either[Exception, EmailAddress] =
+    def apply(v: String): Either[BuildFailure[String], EmailAddress] =
       if (v.contains("@"))
         Right(unsafeBuild(v))
       else
-        Left(new IllegalArgumentException("Not a valid email"))
+        Left(BuildFailure(EmailAddress, v, Some("missing @")))
   }
 }

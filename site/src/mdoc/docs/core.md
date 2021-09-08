@@ -120,12 +120,12 @@ import monix.newtypes._
 
 type EmailAddress = EmailAddress.Type
 
-object EmailAddress extends NewtypeValidated[String, Exception] {
-  def apply(v: String): Either[Exception, EmailAddress] =
+object EmailAddress extends NewtypeValidated[String] {
+  def apply(v: String): Either[BuildFailure[String], EmailAddress] =
     if (v.contains("@")) 
       Right(unsafeBuild(v))
     else 
-      Left(new IllegalArgumentException("Not a valid email"))
+      Left(BuildFailure(EmailAddress, v, Some("missing @")))
 }
 ```
 

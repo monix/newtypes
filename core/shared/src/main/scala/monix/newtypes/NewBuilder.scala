@@ -35,19 +35,22 @@ object NewBuilder {
 final case class BuildFailure[Source](
   targetTypeName: String,
   value: Source,
+  message: Option[String],
 )
 
 object BuildFailure {
-  def apply[Src](companion: NewEncoding[Src], value: Src): BuildFailure[Src] =
+  def apply[Src](companion: NewEncoding[Src], value: Src, message: Option[String]): BuildFailure[Src] =
     BuildFailure(
       targetTypeName = getName(companion),
       value = value,
+      message = message,
     )
 
-  def apply[Src[_], A](companion: NewEncodingK[Src], value: Src[A]): BuildFailure[Src[A]] =
+  def apply[Src[_], A](companion: NewEncodingK[Src], value: Src[A], message: Option[String]): BuildFailure[Src[A]] =
     BuildFailure(
       targetTypeName = getName(companion),
       value = value,
+      message = message,
     )
 
   private[this] def getName(o: AnyRef): String =
