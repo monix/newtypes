@@ -44,4 +44,11 @@ abstract class NewtypeWrapped[Src] extends Newtype[Src] {
 
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(value(ev(a)))
+
+  implicit val codec: Codec.Aux[Type, Src] =
+    new Codec[Type] {
+      type Source = Src
+      def extract(value: Type) = value.value
+      def build(value: Src) = Right(apply(value))
+    }
 }

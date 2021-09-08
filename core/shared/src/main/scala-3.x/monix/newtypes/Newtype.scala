@@ -28,9 +28,12 @@ abstract class Newtype[Src] { companion =>
     final def value: Src = self
   }
 
-  protected final def unsafeCoerce(value: Src): Type =
+  protected inline final def unsafeCoerce(value: Src): Type =
     value
 
   protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev
+
+  protected def typeName: String =
+    getClass().getSimpleName().replaceFirst("[$]$", "")
 }
