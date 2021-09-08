@@ -17,26 +17,17 @@
 
 package monix.newtypes
 
-/** $newtypeBaseDescription */
-abstract class Newtype[Src] { companion =>
-  opaque type Type = Src
+/**
+  * Type-class.
+  */
+trait NewExtractor[NewT] {
+  type Source
 
-  extension (self: Type) {
-    inline final def value: Src = self
-  }
+  def extract(value: NewT): Source
+}
 
-  protected inline final def unsafeCoerce(value: Src): Type =
-    value
-
-  protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
-    ev
-
-  protected def typeName: String =
-    getClass().getSimpleName().replaceFirst("[$]$", "")
-    
-  implicit val codec: NewExtractor.Aux[Type, Src] =
-    new NewExtractor[Type] {
-      type Source = Src
-      def extract(value: Type) = value.value
-    }
+object NewExtractor {
+  type Aux[T, S] = NewExtractor[T] { type Source = S }
+  
+  def apply[T](implicit ev: NewBuilder[T]) = ev
 }

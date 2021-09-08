@@ -41,6 +41,12 @@ abstract class NewtypeK[Src[_]] extends CoreScalaDoc { companion =>
   @inline
   protected final def deriveK[F[_[_]]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
+
+  implicit final def extractor[A]: NewExtractor.Aux[Type[A], Src[A]] =
+    new NewExtractor[Type[A]] {
+      type Source = Src[A]
+      def extract(value: Type[A]) = value.value
+    }
 }
 
 /** $newtypeCovariantKDescription */

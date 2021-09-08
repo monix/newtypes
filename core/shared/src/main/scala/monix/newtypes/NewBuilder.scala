@@ -17,26 +17,19 @@
 
 package monix.newtypes
 
-trait Codec[NewT] {
+/**
+  * Type-class.
+  */
+trait NewBuilder[NewT] {
   type Source
 
-  def extract(value: NewT): Source
   def build(value: Source): Either[BuildFailure[Source], NewT]
 }
 
-object Codec {
-  type Aux[T, S] = Codec[T] { type Source = S }
-}
+object NewBuilder {
+  type Aux[T, S] = NewBuilder[T] { type Source = S }
 
-trait CodecK[NewT[_]] {
-  type Source[A]
-
-  def extract[A](value: NewT[A]): Source[A]
-  def build[A](value: Source[A]): Either[BuildFailure[Source[A]], NewT[A]]
-}
-
-object CodecK {
-  type Aux[F[_], S[_]] = CodecK[F] { type Source[A] = S[A] }
+  def apply[T](implicit ev: NewBuilder[T]) = ev
 }
 
 final case class BuildFailure[Source](

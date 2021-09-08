@@ -38,4 +38,10 @@ abstract class Newtype[Src] extends CoreScalaDoc { companion =>
 
   protected def typeName: String =
     getClass().getSimpleName().replaceFirst("[$]$", "")
+
+  implicit final val extractor: NewExtractor.Aux[Type, Src] =
+    new NewExtractor[Type] {
+      type Source = Src
+      def extract(value: Type) = value.value
+    }
 }

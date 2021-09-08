@@ -42,12 +42,9 @@ abstract class NewtypeValidated[Src, E] extends Newtype[Src] {
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(ev(a).value)
 
-
-  implicit val codec: Codec.Aux[Type, Src] =
-    new Codec[Type] {
+  implicit final val builder: NewBuilder.Aux[Type, Src] =
+    new NewBuilder[Type] {
       type Source = Src
-      def extract(value: Type) = 
-        value.value
       def build(value: Src) = 
         apply(value).left.map(_ => BuildFailure(typeName, value))
     }
