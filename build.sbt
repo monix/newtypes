@@ -19,9 +19,9 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala3   = "3.0.2"
-val Scala213 = "2.13.6"
 val Scala212 = "2.12.14"
+val Scala213 = "2.13.6"
+val Scala3   = "3.0.2"
 
 val CatsVersion        = "2.6.1"
 val ScalaTestVersion   = "3.2.9"
@@ -51,7 +51,7 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "newtypes",
 
   organization := "io.monix",
-  scalaVersion := Scala3,
+  scalaVersion := Scala213,
   crossScalaVersions := Seq(Scala212, Scala213, Scala3),
 
   // Turning off fatal warnings for doc generation
