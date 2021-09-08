@@ -18,7 +18,7 @@
 package monix.newtypes
 
 /** $newtypeBaseDescription */
-abstract class Newtype[Src] extends CoreScalaDoc { companion =>
+abstract class Newtype[Src] extends CoreScalaDoc {
   type Base = Any { type NewType$base }
   trait Tag extends Any
   type Type <: Base with Tag
@@ -27,10 +27,13 @@ abstract class Newtype[Src] extends CoreScalaDoc { companion =>
     x.asInstanceOf[Src]
 
   implicit final class Ops(val self: Type) {
-    @inline def value: Src = companion.value(self)
+    @inline def value: Src = Newtype.this.value(self)
   }
 
-  @inline protected final def unsafeCoerce(value: Src): Type =
+  @inline protected final def extract(value: Type): Src =
+    value.asInstanceOf[Src]
+
+  @inline protected final def unsafeBuild(value: Src): Type =
     value.asInstanceOf[Type]
 
   @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =

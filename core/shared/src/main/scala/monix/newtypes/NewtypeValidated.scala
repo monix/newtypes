@@ -27,7 +27,7 @@ package monix.newtypes
   *   object EmailAddress extends NewtypeValidated[String, Exception] { 
   *     def apply(v: String): Either[Exception, EmailAddress] = 
   *       if (v.contains("@")) 
-  *         Right(unsafeCoerce(v)) 
+  *         Right(unsafeBuild(v)) 
   *       else 
   *         Left(new IllegalArgumentException("Not a valid email")) 
   *   } 
@@ -37,7 +37,7 @@ abstract class NewtypeValidated[Src, E] extends Newtype[Src] {
   def apply(value: Src): Either[E, Type]
 
   final def unsafe(value: Src): Type =
-    unsafeCoerce(value)
+    unsafeBuild(value)
 
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(ev(a).value)

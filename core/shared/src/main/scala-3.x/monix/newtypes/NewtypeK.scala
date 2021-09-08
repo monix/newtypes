@@ -25,7 +25,7 @@ abstract class NewtypeK[Src[_]] {
     inline def value: Src[A] = self
   }
 
-  protected inline def unsafeCoerce[A](value: Src[A]): Type[A] =
+  protected inline def unsafeBuild[A](value: Src[A]): Type[A] =
     value
 
   protected inline final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =

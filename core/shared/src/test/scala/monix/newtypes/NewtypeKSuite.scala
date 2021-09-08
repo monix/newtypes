@@ -82,7 +82,7 @@ object NewtypeKSuite {
 
   object Nel extends NewtypeK[List] {
     def apply[A](head: A, tail: A*): Nel[A] =
-      unsafeCoerce(head :: tail.toList)
+      unsafeBuild(head :: tail.toList)
 
     def unapply[F[_], A](list: F[A])(implicit ev: F[A] =:= Nel[A]): Some[(A, List[A])] = {
       val l = value(list)

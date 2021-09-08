@@ -18,14 +18,14 @@
 package monix.newtypes
 
 /** $newtypeBaseDescription */
-abstract class Newtype[Src] { companion =>
+abstract class Newtype[Src] extends CoreScalaDoc { companion =>
   opaque type Type = Src
 
   extension (self: Type) {
     inline final def value: Src = self
   }
 
-  protected inline final def unsafeCoerce(value: Src): Type =
+  protected inline final def unsafeBuild(value: Src): Type =
     value
 
   protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
