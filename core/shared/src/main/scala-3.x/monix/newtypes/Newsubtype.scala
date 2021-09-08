@@ -18,19 +18,6 @@
 package monix.newtypes
 
 /** $newsubtypeBaseDescription */
-abstract class Newsubtype[Src] { companion =>
-  opaque type Type <: Src = Src
-
-  // TODO: add inline after when this PR ships in Scala compiler
-  // https://github.com/lampepfl/dotty/pull/12815
-
-  extension (self: Type) {
-    final def value: Src = self
-  }
-
-  protected final def unsafeCoerce(value: Src): Type =
-    value
-
-  protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
-    ev
+abstract class Newsubtype[Src] extends NewEncoding[Src] { companion =>
+  override opaque type Type <: Src = Src
 }

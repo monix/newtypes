@@ -17,9 +17,8 @@
 
 package monix.newtypes
 
-/** $newtypeBaseDescription */
-abstract class Newtype[Src] extends CoreScalaDoc {
-  type Base = Any { type NewType$base }
+private[newtypes] trait NewEncoding[Src] {
+  type Base
   trait Tag extends Any
   type Type <: Base with Tag
 
@@ -27,7 +26,7 @@ abstract class Newtype[Src] extends CoreScalaDoc {
     x.asInstanceOf[Src]
 
   implicit final class Ops(val self: Type) {
-    @inline def value: Src = Newtype.this.value(self)
+    @inline def value: Src = NewEncoding.this.value(self)
   }
 
   @inline protected final def extract(value: Type): Src =
@@ -47,4 +46,12 @@ abstract class Newtype[Src] extends CoreScalaDoc {
       type Source = Src
       def extract(value: Type) = value.value
     }
+}
+
+private[newtypes] trait NewsubtypeTrait[Src] extends NewEncoding[Src] {
+  override type Base = Src
+}
+
+private[newtypes] trait NewtypeTrait[Src] extends NewEncoding[Src] {
+  override type Base = Any { type NewType$base }
 }

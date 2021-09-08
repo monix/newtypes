@@ -32,6 +32,7 @@ class NewsubtypeKSuite extends AnyFunSuite {
 
   test("newsubtype is 'translucent'") {
     val n: List[Any] = Nel("Alex", "John")
+    assert(n == List("Alex", "John"))
   }
 
   test("newsubtype is type-safe") {
@@ -80,7 +81,7 @@ object NewsubtypeKSuite {
 
   object Nel extends NewsubtypeK[List] {
     def apply[A](head: A, tail: A*): Nel[A] =
-      unsafeCoerce(head :: tail.toList)
+      unsafeBuild(head :: tail.toList)
 
     def unapply[F[_], A](list: F[A])(implicit ev: F[A] =:= Nel[A]): Some[(A, List[A])] = {
       val l = value(list)

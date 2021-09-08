@@ -17,22 +17,6 @@
 
 package monix.newtypes
 
-/** $newsubtypeBaseDescription */
-abstract class Newsubtype[Src] extends CoreScalaDoc { companion =>
-  type Base = Src
-  trait Tag extends Any
-  type Type <: Base with Tag
+abstract class NewsubtypeK[Src[_]] extends NewsubtypeTraitK[Src]
 
-  @inline final def value(x: Type): Src =
-    x.asInstanceOf[Src]
-
-  implicit final class Ops(val self: Type) {
-    @inline def value: Src = companion.value(self)
-  }
-
-  @inline protected final def unsafeCoerce(value: Src): Type =
-    value.asInstanceOf[Type]
-
-  @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
-    ev.asInstanceOf[F[Type]]
-}
+abstract class NewsubtypeCovariantK[Src[+_]] extends NewsubtypeCovariantTraitK[Src]

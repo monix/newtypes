@@ -17,7 +17,7 @@
 
 package monix.newtypes
 
-/** $newtypeBaseDescription */
-abstract class Newtype[Src] extends NewEncoding[Src] with CoreScalaDoc {
-  override opaque type Type = Src
-}
+/**
+  * ???
+  */
+abstract class Newsubtype[Src] extends NewsubtypeTrait[Src]

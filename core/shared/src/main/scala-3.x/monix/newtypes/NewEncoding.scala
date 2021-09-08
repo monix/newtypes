@@ -17,7 +17,25 @@
 
 package monix.newtypes
 
-/** $newtypeBaseDescription */
-abstract class Newtype[Src] extends NewEncoding[Src] with CoreScalaDoc {
-  override opaque type Type = Src
+private[newtypes] trait NewEncoding[Src] {
+  type Type
+
+  extension (self: Type) {
+    inline final def value: Src = self.asInstanceOf[Src]
+  }
+
+  protected inline final def unsafeBuild(value: Src): Type =
+    value.asInstanceOf[Type]
+
+  protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
+    ev.asInstanceOf[F[Type]]
+
+  protected def typeName: String =
+    getClass().getSimpleName().replaceFirst("[$]$", "")
+    
+  implicit val codec: NewExtractor.Aux[Type, Src] =
+    new NewExtractor[Type] {
+      type Source = Src
+      def extract(value: Type) = NewEncoding.this.value(value)
+    }
 }

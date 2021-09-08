@@ -17,17 +17,16 @@
 
 package monix.newtypes
 
-/** $newtypeKDescription */
-abstract class NewtypeK[Src[_]] extends CoreScalaDoc {
-  type Base = Any { type NewType$base }
+private[newtypes] trait NewEncodingK[Src[_]] {
+  type Base[A]
   trait Tag extends Any
-  type Type[A] <: Base with Tag
+  type Type[A] <: Base[A] with Tag
 
   @inline final def value[A](x: Type[A]): Src[A] =
     x.asInstanceOf[Src[A]]
 
   implicit final class Ops[A](val self: Type[A]) {
-    @inline final def value: Src[A] = NewtypeK.this.value(self)
+    @inline final def value: Src[A] = NewEncodingK.this.value(self)
   }
 
   @inline
@@ -49,7 +48,20 @@ abstract class NewtypeK[Src[_]] extends CoreScalaDoc {
     }
 }
 
-/** $newtypeCovariantKDescription */
-abstract class NewtypeCovariantK[Src[+_]] extends NewtypeK[Src] {
-  override type Type[+A] <: Base with Tag
+private[newtypes] trait NewtypeTraitK[Src[_]] extends NewEncodingK[Src] { 
+  override type Base[A] = Any { type NewType$base }
+}
+
+private[newtypes] trait NewtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src] {
+  override type Base[+A] = Any { type NewType$base }
+  override type Type[+A] <: Base[A] with Tag
+}
+
+private[newtypes] trait NewsubtypeTraitK[Src[_]] extends NewEncodingK[Src] { 
+  override type Base[A] = Src[A]
+}
+
+private[newtypes] trait NewsubtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src] {
+  override type Base[+A] = Src[A]
+  override type Type[+A] <: Base[A] with Tag
 }

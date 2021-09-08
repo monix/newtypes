@@ -28,7 +28,7 @@ abstract class NewsubtypeK[Src[_]] {
     def value: Src[A] = self
   }
 
-  protected def unsafeCoerce[A](value: Src[A]): Type[A] =
+  protected def unsafeBuild[A](value: Src[A]): Type[A] =
     value
 
   protected final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =
