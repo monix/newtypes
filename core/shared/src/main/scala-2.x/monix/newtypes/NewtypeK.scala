@@ -18,7 +18,7 @@
 package monix.newtypes
 
 /** $newtypeKDescription */
-abstract class NewtypeK[Src[_]] extends CoreScalaDoc { companion =>
+abstract class NewtypeK[Src[_]] extends CoreScalaDoc {
   type Base = Any { type NewType$base }
   trait Tag extends Any
   type Type[A] <: Base with Tag
@@ -27,7 +27,7 @@ abstract class NewtypeK[Src[_]] extends CoreScalaDoc { companion =>
     x.asInstanceOf[Src[A]]
 
   implicit final class Ops[A](val self: Type[A]) {
-    @inline final def value: Src[A] = companion.value(self)
+    @inline final def value: Src[A] = NewtypeK.this.value(self)
   }
 
   @inline

@@ -18,7 +18,7 @@
 package monix.newtypes
 
 /** $newtypeBaseDescription */
-abstract class Newtype[Src] extends CoreScalaDoc { companion =>
+abstract class Newtype[Src] extends CoreScalaDoc {
   opaque type Type = Src
 
   extension (self: Type) {
@@ -37,6 +37,6 @@ abstract class Newtype[Src] extends CoreScalaDoc { companion =>
   implicit val codec: NewExtractor.Aux[Type, Src] =
     new NewExtractor[Type] {
       type Source = Src
-      def extract(value: Type) = value.value
+      def extract(value: Type) = Newtype.this.value(value)
     }
 }
