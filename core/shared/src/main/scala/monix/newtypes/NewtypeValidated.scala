@@ -46,6 +46,6 @@ abstract class NewtypeValidated[Src, E] extends Newtype[Src] {
     new NewBuilder[Type] {
       type Source = Src
       def build(value: Src) = 
-        apply(value).left.map(_ => BuildFailure(typeName, value))
+        apply(value).left.map(_ => BuildFailure(NewtypeValidated.this, value))
     }
 }

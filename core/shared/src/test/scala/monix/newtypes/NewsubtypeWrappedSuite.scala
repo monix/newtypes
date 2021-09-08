@@ -32,6 +32,7 @@ class NewsubtypeWrappedSuite extends AnyFunSuite {
 
   test("newsubtype is 'translucent'") {
     val n: String = YourName("Alex")
+    assert(n == "Alex")
   }
 
   test("newsubtype is type-safe") {

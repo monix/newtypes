@@ -36,3 +36,20 @@ final case class BuildFailure[Source](
   targetTypeName: String,
   value: Source,
 )
+
+object BuildFailure {
+  def apply[Src](companion: NewEncoding[Src], value: Src): BuildFailure[Src] =
+    BuildFailure(
+      targetTypeName = getName(companion),
+      value = value,
+    )
+
+  def apply[Src[_], A](companion: NewEncodingK[Src], value: Src[A]): BuildFailure[Src[A]] =
+    BuildFailure(
+      targetTypeName = getName(companion),
+      value = value,
+    )
+
+  private[this] def getName(o: AnyRef): String =
+    o.getClass().getSimpleName().replaceFirst("[$]$", "")
+}

@@ -40,7 +40,7 @@ package monix.newtypes
   *         type Source = String
   *         def build(v: String): Either[BuildFailure[String], EmailAddress] =
   *           apply(v) match {
-  *             case None => Left(BuildFailure(typeName, v))
+  *             case None => Left(BuildFailure(EmailAddress, v))
   *             case Some(r) => Right(r)
   *           }
   *       }

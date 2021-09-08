@@ -38,9 +38,6 @@ private[newtypes] trait NewEncoding[Src] {
   @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  protected def typeName: String =
-    getClass().getSimpleName().replaceFirst("[$]$", "")
-
   implicit final val extractor: NewExtractor.Aux[Type, Src] =
     new NewExtractor[Type] {
       type Source = Src
