@@ -18,7 +18,7 @@
 package monix.newtypes
 
 /** $newtypeKDescription */
-abstract class NewtypeK[Src[_]] extends CoreScalaDoc { companion =>
+abstract class NewtypeK[Src[_]] extends CoreScalaDoc {
   type Base = Any { type NewType$base }
   trait Tag extends Any
   type Type[A] <: Base with Tag
@@ -27,11 +27,11 @@ abstract class NewtypeK[Src[_]] extends CoreScalaDoc { companion =>
     x.asInstanceOf[Src[A]]
 
   implicit final class Ops[A](val self: Type[A]) {
-    @inline final def value: Src[A] = companion.value(self)
+    @inline final def value: Src[A] = NewtypeK.this.value(self)
   }
 
   @inline
-  protected final def unsafeCoerce[A](value: Src[A]): Type[A] =
+  protected final def unsafeBuild[A](value: Src[A]): Type[A] =
     value.asInstanceOf[Type[A]]
 
   @inline
@@ -41,6 +41,12 @@ abstract class NewtypeK[Src[_]] extends CoreScalaDoc { companion =>
   @inline
   protected final def deriveK[F[_[_]]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
+
+  implicit final def extractor[A]: NewExtractor.Aux[Type[A], Src[A]] =
+    new NewExtractor[Type[A]] {
+      type Source = Src[A]
+      def extract(value: Type[A]) = value.value
+    }
 }
 
 /** $newtypeCovariantKDescription */

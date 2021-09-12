@@ -17,26 +17,22 @@
 
 package monix.newtypes
 
-/** $newtypeBaseDescription */
-abstract class Newtype[Src] extends CoreScalaDoc {
-  opaque type Type = Src
+/**
+  * Type-class.
+  */
+trait NewBuilder[NewT] {
+  type Source
 
-  extension (self: Type) {
-    inline final def value: Src = self
-  }
-
-  protected inline final def unsafeBuild(value: Src): Type =
-    value
-
-  protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
-    ev
-
-  protected def typeName: String =
-    getClass().getSimpleName().replaceFirst("[$]$", "")
-    
-  implicit val codec: NewExtractor.Aux[Type, Src] =
-    new NewExtractor[Type] {
-      type Source = Src
-      def extract(value: Type) = Newtype.this.value(value)
-    }
+  def build(value: Source): Either[BuildFailure[Source], NewT]
 }
+
+object NewBuilder {
+  type Aux[T, S] = NewBuilder[T] { type Source = S }
+
+  def apply[T](implicit ev: NewBuilder[T]) = ev
+}
+
+final case class BuildFailure[Source](
+  targetTypeName: String,
+  value: Source,
+)

@@ -17,8 +17,9 @@
 
 package monix.newtypes
 
-/** @define newtypeBaseDescription Base class for defining newtypes 
- *          that have no type parameters.
+/** 
+  * @define newtypeBaseDescription Base class for defining newtypes 
+  *          that have no type parameters.
   *
   *         This class does not define any "builder", as you're 
   *         expected to provide one yourself.
@@ -28,7 +29,7 @@ package monix.newtypes
   *
   *           object EmailAddress extends Newtype[String] { 
   *             def apply(value: String): Option[EmailAddress] = 
-  *               if (value.contains("@")) Some(unsafeCoerce(value)) 
+  *               if (value.contains("@")) Some(unsafeBuild(value)) 
   *               else None 
   *           } 
   *         }}}
@@ -47,7 +48,7 @@ package monix.newtypes
   *
   *           object Nel extends NewtypeK[List] { 
   *             def apply[A](head: A, tail: A*): Nel[A] = 
-  *               unsafeCoerce(head :: tail.toList)
+  *               unsafeBuild(head :: tail.toList)
   *
   *             def unapply[F[_], A](list: F[A])(
   *               implicit ev: F[A] =:= Nel[A]
@@ -79,7 +80,7 @@ package monix.newtypes
   *
   *           object NonEmptyList extends NewtypeCovariantK[List] { 
   *             def apply[A](head: A, tail: A*): NonEmptyList[A] = 
-  *               unsafeCoerce(head :: tail.toList)
+  *               unsafeBuild(head :: tail.toList)
   *
   *             def unapply[F[_], A](list: F[A])(
   *               implicit ev: F[A] =:= NonEmptyList[A]

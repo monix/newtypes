@@ -21,21 +21,24 @@ package monix.newtypes
 abstract class NewtypeK[Src[_]] {
   opaque type Type[A] = Src[A]
 
-  // TODO: add inline after when this PR ships in Scala compiler
-  // https://github.com/lampepfl/dotty/pull/12815
-
   extension [A](self: Type[A]) {
-    def value: Src[A] = self
+    inline def value: Src[A] = self
   }
 
-  protected def unsafeCoerce[A](value: Src[A]): Type[A] =
+  protected inline def unsafeBuild[A](value: Src[A]): Type[A] =
     value
 
-  protected final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =
+  protected inline final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =
     ev
 
-  protected final def deriveK[F[_[_]]](using ev: F[Src]): F[Type] =
+  protected inline final def deriveK[F[_[_]]](using ev: F[Src]): F[Type] =
     ev
+    
+  implicit final def extractor[A]: NewExtractor.Aux[Type[A], Src[A]] =
+    new NewExtractor[Type[A]] {
+      type Source = Src[A]
+      def extract(value: Type[A]) = value.value
+    }
 }
 
 /** $newtypeCovariantKDescription */
