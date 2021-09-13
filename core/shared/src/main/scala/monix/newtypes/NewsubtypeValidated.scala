@@ -21,24 +21,31 @@ package monix.newtypes
   *
   * This class is for defining newsubtypes with a builder that validates values.
   *
-  * Example: {{{ 
+  * Example: {{{
   *   type EmailAddress = EmailAddress.Type
   *
-  *   object EmailAddress extends NewtypeValidated[String, Exception] { 
-  *     def apply(v: String): Either[Exception, EmailAddress] = 
-  *       if (v.contains("@")) 
-  *         Right(unsafeCoerce(v)) 
-  *       else 
-  *         Left(new IllegalArgumentException("Not a valid email")) 
-  *   } 
+  *   object EmailAddress extends NewtypeValidated[String, Exception] {
+  *     def apply(v: String): Either[Exception, EmailAddress] =
+  *       if (v.contains("@"))
+  *         Right(unsafeBuild(v))
+  *       else
+  *         Left(new IllegalArgumentException("Not a valid email"))
+  *   }
   * }}}
   */
 abstract class NewsubtypeValidated[Src, E] extends Newsubtype[Src] {
   def apply(value: Src): Either[E, Type]
 
   final def unsafe(value: Src): Type =
-    unsafeCoerce(value)
+    unsafeBuild(value)
 
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(ev(a).value)
+
+  implicit final val builder: NewBuilder.Aux[Type, Src] =
+    new NewBuilder[Type] {
+      type Source = Src
+      def build(value: Src) =
+        apply(value).left.map(_ => BuildFailure(typeName, value))
+    }
 }

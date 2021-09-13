@@ -18,19 +18,25 @@
 package monix.newtypes
 
 /** $newsubtypeBaseDescription */
-abstract class Newsubtype[Src] { companion =>
+abstract class Newsubtype[Src] extends CoreScalaDoc {
   opaque type Type <: Src = Src
 
-  // TODO: add inline after when this PR ships in Scala compiler
-  // https://github.com/lampepfl/dotty/pull/12815
-
   extension (self: Type) {
-    final def value: Src = self
+    inline final def value: Src = self
   }
 
-  protected final def unsafeCoerce(value: Src): Type =
+  protected inline final def unsafeBuild(value: Src): Type =
     value
 
-  protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
+  protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev
+
+  protected def typeName: String =
+    getClass().getSimpleName().replaceFirst("[$]$", "")
+
+  implicit val codec: NewExtractor.Aux[Type, Src] =
+    new NewExtractor[Type] {
+      type Source = Src
+      def extract(value: Type) = Newsubtype.this.value(value)
+    }
 }

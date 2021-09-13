@@ -99,5 +99,87 @@ package monix.newtypes
   *
   *         NOTE: the type-parameter is covariant. 
   *         Also see [[NewtypeK]] for working with invariance.
+  *
+  * @define newsubtypeBaseDescription Base class for defining newsubtypes 
+  *         that have no type parameters.
+  *
+  *         This class does not define any "builder", as you're 
+  *         expected to provide one yourself.
+  *
+  *         Usage: {{{ 
+  *           type PositiveInt = PositiveInt.Type
+  *
+  *           object PositiveInt extends Newsubtype[Int] { 
+  *             def apply(value: Int): Option[PositiveInt] = 
+  *               if (value > 0) Some(unsafeBuild(value)) 
+  *               else None 
+  *           } 
+  *         }}}
+  *
+  *         @see [[NewsubtypeWrapped]]
+  *
+  * @define newsubtypeKDescription For building newsubtypes over types that 
+  *         have an invariant type parameter (higher-kinded types).
+  *
+  *         Example: {{{ 
+  *           // Only needed for type-class derivation 
+  *           import cats._ 
+  *           import cats.implicits._
+  *
+  *           type Nelsub[A] = Nelsub.Type[A]
+  *
+  *           object Nelsub extends NewsubtypeK[List] { 
+  *             def apply[A](head: A, tail: A*): Nelsub[A] = 
+  *               unsafeBuild(head :: tail.toList)
+  *
+  *             def unapply[F[_], A](list: F[A])(
+  *               implicit ev: F[A] =:= Nelsub[A]
+  *             ): Some[(A, List[A])] = { 
+  *               val l = value(list)
+  *               Some((l.head, l.tail)) 
+  *             }
+  *
+  *             implicit def eq[A: Eq]: Eq[Nelsub[A]] = derive
+  *
+  *             implicit val traverse: Traverse[Nelsub] = deriveK
+  *
+  *             implicit val monad: Monad[Nelsub] = deriveK 
+  *           } 
+  *         }}}
+  *
+  * NOTE: the type-parameter is invariant. See [[NewsubtypeCovariantK]].
+  *
+  * @define newsubtypeCovariantKDescription For building newsubtypes over 
+  *         types that have a covariant type parameter 
+  *         (higher-kinded types).
+  *
+  *         Example: {{{ 
+  *           // Only needed for type-class derivation 
+  *           import cats._ 
+  *           import cats.implicits._
+  *
+  *           type NonEmptyListSub[A] = NonEmptyListSub.Type[A]
+  *
+  *           object NonEmptyListSub extends NewsubtypeCovariantK[List] { 
+  *             def apply[A](head: A, tail: A*): NonEmptyListSub[A] = 
+  *               unsafeBuild(head :: tail.toList)
+  *
+  *             def unapply[F[_], A](list: F[A])(
+  *               implicit ev: F[A] =:= NonEmptyListSub[A]
+  *             ): Some[(A, List[A])] = { 
+  *               val l = value(list)
+  *               Some((l.head, l.tail)) 
+  *             }
+  *
+  *             implicit def eq[A: Eq]: Eq[NonEmptyListSub[A]] = derive
+  *
+  *             implicit val traverse: Traverse[NonEmptyListSub] = deriveK
+  *
+  *             implicit val monad: Monad[NonEmptyListSub] = deriveK 
+  *           } 
+  *         }}}
+  *
+  *         NOTE: the type-parameter is covariant. 
+  *         Also see [[NewsubtypeK]] for working with invariance.
   */
 private[newtypes] trait CoreScalaDoc

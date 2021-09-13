@@ -18,7 +18,7 @@
 package monix.newtypes
 
 /** $newsubtypeBaseDescription */
-abstract class Newsubtype[Src] extends CoreScalaDoc { companion =>
+abstract class Newsubtype[Src] extends CoreScalaDoc {
   type Base = Src
   trait Tag extends Any
   type Type <: Base with Tag
@@ -27,12 +27,24 @@ abstract class Newsubtype[Src] extends CoreScalaDoc { companion =>
     x.asInstanceOf[Src]
 
   implicit final class Ops(val self: Type) {
-    @inline def value: Src = companion.value(self)
+    @inline def value: Src = Newsubtype.this.value(self)
   }
 
-  @inline protected final def unsafeCoerce(value: Src): Type =
+  @inline protected final def extract(value: Type): Src =
+    value.asInstanceOf[Src]
+
+  @inline protected final def unsafeBuild(value: Src): Type =
     value.asInstanceOf[Type]
 
   @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
+
+  protected def typeName: String =
+    getClass().getSimpleName().replaceFirst("[$]$", "")
+
+  implicit final val extractor: NewExtractor.Aux[Type, Src] =
+    new NewExtractor[Type] {
+      type Source = Src
+      def extract(value: Type) = value.value
+    }
 }

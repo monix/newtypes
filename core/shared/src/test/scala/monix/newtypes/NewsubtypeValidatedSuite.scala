@@ -74,7 +74,7 @@ object NewsubtypeValidatedSuite {
   object EmailAddress extends NewsubtypeValidated[String, Exception] {
     def apply(v: String): Either[Exception, EmailAddress] =
       if (v.contains("@"))
-        Right(unsafeCoerce(v))
+        Right(unsafeBuild(v))
       else
         Left(new IllegalArgumentException("Not a valid email"))
   }
