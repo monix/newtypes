@@ -20,7 +20,7 @@ package monix.newtypes
 /**
   * Base class for defining newtypes that have no type parameters.
   *
-  * This class does not define any "builder", or related [[NewBuilder]]
+  * This class does not define any "builder", or related [[HasBuilder]]
   * instance, as you're expected to provide one yourself.
   *
   * Usage sample: {{{ 
@@ -35,13 +35,16 @@ package monix.newtypes
   * 
   *     // Recommended instance, but not required; 
   *     // use Newtype.Validated to get rid of this boilerplate ;-)
-  *     implicit val builder: NewBuilder.Aux[EmailAddress, String] =
-  *       new NewBuilder[EmailAddress] {
+  *     implicit val builder: HasBuilder.Aux[EmailAddress, String] =
+  *       new HasBuilder[EmailAddress] {
   *         type Source = String
+  * 
   *         def build(v: String): Either[BuildFailure[String], EmailAddress] =
   *           apply(v) match {
-  *             case None => Left(BuildFailure(EmailAddress, v, Some("missing @")))
-  *             case Some(r) => Right(r)
+  *             case Some(r) => 
+  *               Right(r)
+  *             case None => 
+  *               Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
   *           }
   *       }
   *   } 

@@ -30,8 +30,18 @@ private[newtypes] trait NewEncoding[Src] {
   protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  implicit val codec: NewExtractor.Aux[Type, Src] =
-    new NewExtractor[Type] {
+  implicit val typeInfo: TypeInfo[Type] = {
+    val raw = TypeInfo.forClasses(ClassTag(getClass()))
+    TypeInfo(
+      typeName = raw.typeName.replaceFirst("[$]$", ""),
+      typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
+      packageName = raw.packageName,
+      typeParams = Nil
+    )
+  }
+
+  implicit val codec: HasExtractor.Aux[Type, Src] =
+    new HasExtractor[Type] {
       type Source = Src
       def extract(value: Type) = NewEncoding.this.value(value)
     }

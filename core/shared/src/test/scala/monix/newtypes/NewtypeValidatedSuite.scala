@@ -76,6 +76,6 @@ object NewtypeValidatedSuite {
       if (v.contains("@"))
         Right(unsafeBuild(v))
       else
-        Left(BuildFailure(EmailAddress, v, None))
+        Left(BuildFailure(TypeInfo.of[EmailAddress], v, None))
   }
 }

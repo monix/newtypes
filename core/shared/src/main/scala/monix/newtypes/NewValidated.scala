@@ -17,7 +17,7 @@
 
 package monix.newtypes
 
-private[newtypes] trait MixInValidate[Src] { self: NewEncoding[Src] =>
+private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
   def apply(value: Src): Either[BuildFailure[Src], Type]
 
   final def unsafe(value: Src): Type =
@@ -26,8 +26,8 @@ private[newtypes] trait MixInValidate[Src] { self: NewEncoding[Src] =>
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(ev(a).value)
 
-  implicit final val builder: NewBuilder.Aux[Type, Src] =
-    new NewBuilder[Type] {
+  implicit final val builder: HasBuilder.Aux[Type, Src] =
+    new HasBuilder[Type] {
       type Source = Src
       def build(value: Src) = apply(value)
     }
@@ -49,7 +49,7 @@ private[newtypes] trait MixInValidate[Src] { self: NewEncoding[Src] =>
   *   } 
   * }}}
   */
-abstract class NewtypeValidated[Src] extends Newtype[Src] with MixInValidate[Src]
+abstract class NewtypeValidated[Src] extends Newtype[Src] with NewValidated[Src]
 
 /** A validated [[Newsubtype]].
   *
@@ -67,4 +67,4 @@ abstract class NewtypeValidated[Src] extends Newtype[Src] with MixInValidate[Src
   *   }
   * }}}
   */
-abstract class NewsubtypeValidated[Src, E] extends Newsubtype[Src] with MixInValidate[Src]
+abstract class NewsubtypeValidated[Src] extends Newsubtype[Src] with NewValidated[Src]

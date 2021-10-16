@@ -71,11 +71,11 @@ class NewsubtypeValidatedSuite extends AnyFunSuite {
 object NewsubtypeValidatedSuite {
   type EmailAddress = EmailAddress.Type
 
-  object EmailAddress extends NewsubtypeValidated[String, Exception] {
+  object EmailAddress extends NewsubtypeValidated[String] {
     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
       if (v.contains("@"))
         Right(unsafeBuild(v))
       else
-        Left(BuildFailure(EmailAddress, v, Some("missing @")))
+        Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
   }
 }

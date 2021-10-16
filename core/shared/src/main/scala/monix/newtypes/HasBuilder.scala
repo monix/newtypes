@@ -17,17 +17,20 @@
 
 package monix.newtypes
 
-/**
-  * Type-class.
-  */
-trait NewExtractor[NewT] {
+trait HasBuilder[Type] {
   type Source
 
-  def extract(value: NewT): Source
+  def build(value: Source): Either[BuildFailure[Source], Type]
 }
 
-object NewExtractor {
-  type Aux[T, S] = NewExtractor[T] { type Source = S }
-  
-  def apply[T](implicit ev: NewBuilder[T]) = ev
+object HasBuilder {
+  type Aux[T, S] = HasBuilder[T] { type Source = S }
+
+  def apply[T](implicit ev: HasBuilder[T]) = ev
 }
+
+final case class BuildFailure[Source](
+  typeInfo: TypeInfo[_],
+  value: Source,
+  message: Option[String],
+)

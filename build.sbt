@@ -296,9 +296,9 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
         )
     }),
     // Activates doc testing
-    doctestTestFramework := DoctestTestFramework.ScalaTest,
-    doctestScalaTestVersion := Some(ScalaTestVersion),
-    doctestOnlyCodeBlocksMode := true,
+    // doctestTestFramework := DoctestTestFramework.ScalaTest,
+    // doctestScalaTestVersion := Some(ScalaTestVersion),
+    // doctestOnlyCodeBlocksMode := true,
   )
 
 lazy val coreJVM = core.jvm

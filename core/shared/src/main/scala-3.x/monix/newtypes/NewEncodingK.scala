@@ -33,8 +33,18 @@ private[newtypes] trait NewEncodingK[Src[_]] {
   protected inline final def deriveK[F[_[_]]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  implicit final def extractor[A]: NewExtractor.Aux[Type[A], Src[A]] =
-    new NewExtractor[Type[A]] {
+  implicit def typeName[A: TypeInfo]: TypeInfo[Type[A]] = {
+    val raw = TypeInfo.forClasses(ClassTag(getClass()))
+    TypeInfo(
+      typeName = raw.typeName.replaceFirst("[$]$", ""),
+      typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
+      packageName = raw.packageName,
+      typeParams = List(Some(implicitly[TypeInfo[A]]))
+    )
+  }
+
+  implicit final def extractor[A]: HasExtractor.Aux[Type[A], Src[A]] =
+    new HasExtractor[Type[A]] {
       type Source = Src[A]
       def extract(value: Type[A]) = value.value
     }

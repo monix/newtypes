@@ -17,6 +17,8 @@
 
 package monix.newtypes
 
+import scala.reflect.ClassTag
+
 private[newtypes] trait NewEncoding[Src] {
   type Base
   trait Tag extends Any
@@ -38,8 +40,18 @@ private[newtypes] trait NewEncoding[Src] {
   @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  implicit final val extractor: NewExtractor.Aux[Type, Src] =
-    new NewExtractor[Type] {
+  implicit val typeInfo: TypeInfo[Type] = {
+    val raw = TypeInfo.forClasses(ClassTag(getClass()))
+    TypeInfo(
+      typeName = raw.typeName.replaceFirst("[$]$", ""),
+      typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
+      packageName = raw.packageName,
+      typeParams = Nil
+    )
+  }
+
+  implicit final val extractor: HasExtractor.Aux[Type, Src] =
+    new HasExtractor[Type] {
       type Source = Src
       def extract(value: Type) = value.value
     }

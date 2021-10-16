@@ -44,8 +44,8 @@ abstract class NewsubtypeWrapped[Src] extends Newsubtype[Src] {
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(value(ev(a)))
 
-  implicit final val builder: NewBuilder.Aux[Type, Src] =
-    new NewBuilder[Type] {
+  implicit final val builder: HasBuilder.Aux[Type, Src] =
+    new HasBuilder[Type] {
       type Source = Src
       def build(value: Src) = Right(apply(value))
     }
