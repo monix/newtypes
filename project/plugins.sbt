@@ -1,4 +1,4 @@
-val ScalaJSVersion = Option(System.getenv("SCALAJS_VERSION")).filter(_.nonEmpty).getOrElse("1.7.0")
+val ScalaJSVersion = Option(System.getenv("SCALAJS_VERSION")).filter(_.nonEmpty).getOrElse("1.7.1")
 
 addSbtPlugin("com.47deg"                 % "sbt-microsites"                % "1.3.4")
 addSbtPlugin("com.eed3si9n"              % "sbt-unidoc"                    % "0.4.3")

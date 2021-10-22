@@ -21,7 +21,7 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 
 val Scala212 = "2.12.14"
 val Scala213 = "2.13.6"
-val Scala3   = "3.0.2"
+val Scala3   = "3.1.0"
 
 val CatsVersion        = "2.6.1"
 val ScalaTestVersion   = "3.2.9"
@@ -58,7 +58,7 @@ lazy val sharedSettings = Seq(
   Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
 
   // Turning off fatal warnings and certain annoyances during testing
-  Test / scalacOptions ~= (_ filterNot (Set( 
+  Test / scalacOptions ~= (_ filterNot (Set(
     "-Xfatal-warnings",
     "-Werror",
     "-Ywarn-value-discard",

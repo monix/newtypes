@@ -19,7 +19,11 @@ package monix.newtypes
 
 import scala.reflect.ClassTag
 
-private[newtypes] trait NewEncoding[Src] {
+/**
+  * Scala 2 specific encoding for new-types — common trait to use
+  * in [[monix.newtypes.Newtype]] and [[monix.newtypes.Newsubtype]].
+  */
+private trait NewEncoding[Src] {
   type Base
   trait Tag extends Any
   type Type <: Base with Tag
@@ -41,7 +45,7 @@ private[newtypes] trait NewEncoding[Src] {
     ev.asInstanceOf[F[Type]]
 
   implicit val typeInfo: TypeInfo[Type] = {
-    val raw = TypeInfo.forClasses(ClassTag(getClass()))
+    val raw = TypeInfo.forClasses(ClassTag(getClass))
     TypeInfo(
       typeName = raw.typeName.replaceFirst("[$]$", ""),
       typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
@@ -53,7 +57,7 @@ private[newtypes] trait NewEncoding[Src] {
   implicit final val extractor: HasExtractor.Aux[Type, Src] =
     new HasExtractor[Type] {
       type Source = Src
-      def extract(value: Type) = value.value
+      def extract(value: Type): Src = value.value
     }
 }
 

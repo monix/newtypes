@@ -19,7 +19,12 @@ package monix.newtypes
 
 import scala.reflect.ClassTag
 
-private[newtypes] trait NewEncodingK[Src[_]] {
+/**
+  * Scala 2 specific encoding for newtypes that wrap types with a
+  * type parameter — common trait to use in [[monix.newtypes.NewtypeK]]
+  * and [[monix.newtypes.NewsubtypeK]].
+  */
+private trait NewEncodingK[Src[_]] {
   type Base[A]
   trait Tag extends Any
   type Type[A] <: Base[A] with Tag
@@ -28,7 +33,7 @@ private[newtypes] trait NewEncodingK[Src[_]] {
     x.asInstanceOf[Src[A]]
 
   implicit final class Ops[A](val self: Type[A]) {
-    @inline final def value: Src[A] = NewEncodingK.this.value(self)
+    @inline def value: Src[A] = NewEncodingK.this.value(self)
   }
 
   @inline
@@ -44,7 +49,7 @@ private[newtypes] trait NewEncodingK[Src[_]] {
     ev.asInstanceOf[F[Type]]
 
   implicit def typeName[A: TypeInfo]: TypeInfo[Type[A]] = {
-    val raw = TypeInfo.forClasses(ClassTag(getClass()))
+    val raw = TypeInfo.forClasses(ClassTag(getClass))
     TypeInfo(
       typeName = raw.typeName.replaceFirst("[$]$", ""),
       typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
@@ -56,11 +61,11 @@ private[newtypes] trait NewEncodingK[Src[_]] {
   implicit final def extractor[A]: HasExtractor.Aux[Type[A], Src[A]] =
     new HasExtractor[Type[A]] {
       type Source = Src[A]
-      def extract(value: Type[A]) = value.value
+      def extract(value: Type[A]): Src[A] = value.value
     }
 }
 
-private[newtypes] trait NewtypeTraitK[Src[_]] extends NewEncodingK[Src] { 
+private[newtypes] trait NewtypeTraitK[Src[_]] extends NewEncodingK[Src] {
   override type Base[A] = Any { type NewType$base }
 }
 
@@ -69,7 +74,7 @@ private[newtypes] trait NewtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src
   override type Type[+A] <: Base[A] with Tag
 }
 
-private[newtypes] trait NewsubtypeTraitK[Src[_]] extends NewEncodingK[Src] { 
+private[newtypes] trait NewsubtypeTraitK[Src[_]] extends NewEncodingK[Src] {
   override type Base[A] = Src[A]
 }
 

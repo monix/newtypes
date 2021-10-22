@@ -17,6 +17,14 @@
 
 package monix.newtypes
 
+/**
+  * Type-class used for decoding types.
+  *
+  * Used for automatically deriving decoders (e.g. from JSON)
+  * for newtypes.
+  *
+  * @see [[HasExtractor]] for deriving encoders.
+  */
 trait HasBuilder[Type] {
   type Source
 
@@ -26,9 +34,15 @@ trait HasBuilder[Type] {
 object HasBuilder {
   type Aux[T, S] = HasBuilder[T] { type Source = S }
 
-  def apply[T](implicit ev: HasBuilder[T]) = ev
+  def apply[T](implicit ev: HasBuilder[T]): ev.type = ev
 }
 
+/**
+  * Signals a failed decoding operation, via [[HasBuilder.build]].
+  *
+  * For example, this can happen when decoding from JSON, this
+  * result being used to signal an issue with the JSON document.
+  */
 final case class BuildFailure[Source](
   typeInfo: TypeInfo[_],
   value: Source,

@@ -17,20 +17,10 @@
 
 package monix.newtypes
 
-/**
-  * Type-class used for encoding types.
-  *
-  * Used for automatically deriving encoders (e.g. to JSON)
-  * for newtypes.
-  *
-  * @see [[HasBuilder]] for deriving decoders.
-  */
-trait HasExtractor[Type] {
-  type Source
+private object Platform {
+  def getPackageName(cls: Class[_]): String =
+    cls.getPackageName
 
-  def extract(value: Type): Source
-}
-
-object HasExtractor {
-  type Aux[T, S] = HasExtractor[T] { type Source = S }
+  def getTypeParamsCount(cls: Class[_]): Int =
+    cls.getTypeParameters.length
 }

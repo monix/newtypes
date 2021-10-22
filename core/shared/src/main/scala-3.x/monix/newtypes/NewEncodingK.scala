@@ -17,7 +17,14 @@
 
 package monix.newtypes
 
-private[newtypes] trait NewEncodingK[Src[_]] {
+import scala.reflect.ClassTag
+
+/**
+  * Scala 3 specific encoding for newtypes that wrap types with a
+  * type parameter — common trait to use in [[monix.newtypes.NewtypeK]]
+  * and [[monix.newtypes.NewsubtypeK]].
+  */
+private trait NewEncodingK[Src[_]] {
   type Type[A]
 
   extension [A](self: Type[A]) {
@@ -50,18 +57,18 @@ private[newtypes] trait NewEncodingK[Src[_]] {
     }
 }
 
-private[newtypes] trait NewtypeTraitK[Src[_]] extends NewEncodingK[Src] { 
+private trait NewtypeTraitK[Src[_]] extends NewEncodingK[Src] {
   override opaque type Type[A] = Src[A]
 }
 
-private[newtypes] trait NewtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src] {
+private trait NewtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src] {
   override opaque type Type[+A] = Src[A]
 }
 
-private[newtypes] trait NewsubtypeTraitK[Src[_]] extends NewEncodingK[Src] { 
+private trait NewsubtypeTraitK[Src[_]] extends NewEncodingK[Src] {
   override opaque type Type[A] <: Src[A] = Src[A]
 }
 
-private[newtypes] trait NewsubtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src] {
+private trait NewsubtypeCovariantTraitK[Src[+_]] extends NewEncodingK[Src] {
   override opaque type Type[+A] <: Src[A] = Src[A]
 }

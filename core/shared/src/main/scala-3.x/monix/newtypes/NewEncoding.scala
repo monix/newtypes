@@ -17,7 +17,13 @@
 
 package monix.newtypes
 
-private[newtypes] trait NewEncoding[Src] {
+import scala.reflect.ClassTag
+
+/**
+  * Scala 3 specific encoding for new-types — common trait to use
+  * in [[monix.newtypes.Newtype]] and [[monix.newtypes.Newsubtype]].
+  */
+private trait NewEncoding[Src] {
   type Type
 
   extension (self: Type) {
@@ -31,7 +37,7 @@ private[newtypes] trait NewEncoding[Src] {
     ev.asInstanceOf[F[Type]]
 
   implicit val typeInfo: TypeInfo[Type] = {
-    val raw = TypeInfo.forClasses(ClassTag(getClass()))
+    val raw = TypeInfo.forClasses(ClassTag(getClass))
     TypeInfo(
       typeName = raw.typeName.replaceFirst("[$]$", ""),
       typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
@@ -47,10 +53,10 @@ private[newtypes] trait NewEncoding[Src] {
     }
 }
 
-private[newtypes] trait NewtypeTrait[Src] extends NewEncoding[Src] {
+private trait NewtypeTrait[Src] extends NewEncoding[Src] {
   override opaque type Type = Src
 }
 
-private[newtypes] trait NewsubtypeTrait[Src] extends NewEncoding[Src] {
+private trait NewsubtypeTrait[Src] extends NewEncoding[Src] {
   override opaque type Type <: Src = Src
 }

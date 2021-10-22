@@ -17,6 +17,45 @@
 
 package monix.newtypes
 
+/** A validated [[Newtype]].
+  *
+  * This class is for defining newtypes with a builder that validates values.
+  *
+  * Example: {{{
+  *   type EmailAddress = EmailAddress.Type
+  *
+  *   object EmailAddress extends NewtypeValidated[String] {
+  *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
+  *       if (v.contains("@"))
+  *         Right(unsafeBuild(v))
+  *       else
+  *         Left(BuildFailure(EmailAddress, v, Some("missing @")))
+  *   }
+  * }}}
+  */
+abstract class NewtypeValidated[Src] extends Newtype[Src] with NewValidated[Src]
+
+/** A validated [[Newsubtype]].
+  *
+  * This class is for defining newsubtypes with a builder that validates values.
+  *
+  * Example: {{{
+  *   type EmailAddress = EmailAddress.Type
+  *
+  *   object EmailAddress extends NewsubtypeValidated[String, Exception] {
+  *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
+  *       if (v.contains("@"))
+  *         Right(unsafeBuild(v))
+  *       else
+  *         Left(BuildFailure(EmailAddress, v, Some("missing @")))
+  *   }
+  * }}}
+  */
+abstract class NewsubtypeValidated[Src] extends Newsubtype[Src] with NewValidated[Src]
+
+/**
+  * Common implementation between [[NewtypeValidated]] and [[NewsubtypeValidated]].
+  */
 private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
   def apply(value: Src): Either[BuildFailure[Src], Type]
 
@@ -29,42 +68,7 @@ private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
   implicit final val builder: HasBuilder.Aux[Type, Src] =
     new HasBuilder[Type] {
       type Source = Src
-      def build(value: Src) = apply(value)
+      def build(value: Src): Either[BuildFailure[Src], Type] = apply(value)
     }
 }
 
-/** A validated [[Newtype]].
-  *
-  * This class is for defining newtypes with a builder that validates values.
-  *
-  * Example: {{{ 
-  *   type EmailAddress = EmailAddress.Type
-  *
-  *   object EmailAddress extends NewtypeValidated[String] { 
-  *     def apply(v: String): Either[BuildFailure[String], EmailAddress] = 
-  *       if (v.contains("@")) 
-  *         Right(unsafeBuild(v)) 
-  *       else 
-  *         Left(BuildFailure(EmailAddress, v, Some("missing @")))
-  *   } 
-  * }}}
-  */
-abstract class NewtypeValidated[Src] extends Newtype[Src] with NewValidated[Src]
-
-/** A validated [[Newsubtype]].
-  *
-  * This class is for defining newsubtypes with a builder that validates values.
-  *
-  * Example: {{{ 
-  *   type EmailAddress = EmailAddress.Type
-  *
-  *   object EmailAddress extends NewsubtypeValidated[String, Exception] { 
-  *     def apply(v: String): Either[BuildFailure[String], EmailAddress] = 
-  *       if (v.contains("@")) 
-  *         Right(unsafeBuild(v)) 
-  *       else 
-  *         Left(BuildFailure(EmailAddress, v, Some("missing @"))) 
-  *   }
-  * }}}
-  */
-abstract class NewsubtypeValidated[Src] extends Newsubtype[Src] with NewValidated[Src]
