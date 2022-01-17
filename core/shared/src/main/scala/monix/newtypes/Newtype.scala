@@ -29,7 +29,7 @@ package monix.newtypes
   *   object EmailAddress extends Newtype[String] { self =>
   *     def apply(value: String): Option[EmailAddress] = 
   *       if (value.contains("@")) 
-  *         Some(unsafeBuild(value)) 
+  *         Some(unsafeCoerce(value)) 
   *       else 
   *         None 
   * 

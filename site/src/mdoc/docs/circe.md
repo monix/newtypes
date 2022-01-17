@@ -21,7 +21,7 @@ type Email = Email.Type
 object Email extends NewtypeValidated[String] with DerivedCirceCodec {
   def apply(v: String): Either[BuildFailure[String], Email] =
     if (v.contains("@")) 
-      Right(unsafeBuild(v))
+      Right(unsafeCoerce(v))
     else 
       Left(BuildFailure(TypeInfo.of[Email], v, Some("missing @")))
 }

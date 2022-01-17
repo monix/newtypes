@@ -74,7 +74,7 @@ object NewtypeValidatedSuite {
   object EmailAddress extends NewtypeValidated[String] {
     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
       if (v.contains("@"))
-        Right(unsafeBuild(v))
+        Right(unsafeCoerce(v))
       else
         Left(BuildFailure(TypeInfo.of[EmailAddress], v, None))
   }

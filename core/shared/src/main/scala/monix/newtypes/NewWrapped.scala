@@ -68,7 +68,7 @@ abstract class NewsubtypeWrapped[Src] extends Newsubtype[Src] with NewWrapped[Sr
   * Common implementation between [[NewtypeWrapped]] and [[NewsubtypeWrapped]].
   */
 private[newtypes] trait NewWrapped[Src] { self: NewEncoding[Src] =>
-  final def apply(x: Src): Type = unsafeBuild(x)
+  final def apply(x: Src): Type = unsafeCoerce(x)
 
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(value(ev(a)))

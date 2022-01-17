@@ -38,7 +38,7 @@ private trait NewEncoding[Src] {
   @inline protected final def extract(value: Type): Src =
     value.asInstanceOf[Src]
 
-  @inline protected final def unsafeBuild(value: Src): Type =
+  @inline protected final def unsafeCoerce(value: Src): Type =
     value.asInstanceOf[Type]
 
   @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =

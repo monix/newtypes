@@ -31,7 +31,7 @@ private trait NewEncodingK[Src[_]] {
     inline final def value: Src[A] = self.asInstanceOf[Src[A]]
   }
 
-  protected inline final def unsafeBuild[A](value: Src[A]): Type[A] =
+  protected inline final def unsafeCoerce[A](value: Src[A]): Type[A] =
     value.asInstanceOf[Type[A]]
 
   protected inline final def derive[F[_], A](implicit ev: F[Src[A]]): F[Type[A]] =

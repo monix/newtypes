@@ -75,12 +75,12 @@ class NewtypeKCirceEncoderSuite extends AnyFunSuite {
 object NewtypeKCirceCodecSuite {
   object NelInv0 extends NewtypeK[List] with DerivedCirceEncoder {
     def apply[A](first: A, rest: List[A]): Type[A] =
-      unsafeBuild(first :: rest)
+      unsafeCoerce(first :: rest)
   }
 
   object NelInv extends NewtypeK[List] with DerivedCirceCodec {
     def apply[A](first: A, rest: List[A]): Type[A] =
-      unsafeBuild(first :: rest)
+      unsafeCoerce(first :: rest)
 
     implicit final def builder[A: TypeInfo]: HasBuilder.Aux[Type[A], List[A]] =
       new HasBuilder[Type[A]] {
@@ -98,12 +98,12 @@ object NewtypeKCirceCodecSuite {
 
   object NelCov extends NewtypeCovariantK[List] with DerivedCirceCodec {
     def apply[A](first: A, rest: List[A]): Type[A] =
-      unsafeBuild(first :: rest)
+      unsafeCoerce(first :: rest)
   }
 
   object NelSubInv extends NewsubtypeK[List] with DerivedCirceCodec {
     def apply[A](first: A, rest: List[A]): Type[A] =
-      unsafeBuild(first :: rest)
+      unsafeCoerce(first :: rest)
 
     implicit final def builder[A: TypeInfo]: HasBuilder.Aux[Type[A], List[A]] =
       new HasBuilder[Type[A]] {
@@ -121,6 +121,6 @@ object NewtypeKCirceCodecSuite {
 
   object NelSubCov extends NewsubtypeCovariantK[List] {
     def apply[A](first: A, rest: List[A]): Type[A] =
-      unsafeBuild(first :: rest)
+      unsafeCoerce(first :: rest)
   }
 }

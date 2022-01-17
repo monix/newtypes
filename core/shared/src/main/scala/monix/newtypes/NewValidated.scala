@@ -27,7 +27,7 @@ package monix.newtypes
   *   object EmailAddress extends NewtypeValidated[String] {
   *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
   *       if (v.contains("@"))
-  *         Right(unsafeBuild(v))
+  *         Right(unsafeCoerce(v))
   *       else
   *         Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
   *   }
@@ -45,7 +45,7 @@ abstract class NewtypeValidated[Src] extends Newtype[Src] with NewValidated[Src]
   *   object EmailAddress extends NewsubtypeValidated[String] {
   *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
   *       if (v.contains("@"))
-  *         Right(unsafeBuild(v))
+  *         Right(unsafeCoerce(v))
   *       else
   *         Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
   *   }
@@ -60,7 +60,7 @@ private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
   def apply(value: Src): Either[BuildFailure[Src], Type]
 
   final def unsafe(value: Src): Type =
-    unsafeBuild(value)
+    unsafeCoerce(value)
 
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(ev(a).value)

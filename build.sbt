@@ -3,14 +3,15 @@ import Boilerplate._
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
+import com.typesafe.tools.mima.core._
 
 // ---------------------------------------------------------------------------
 // Commands
 
 /* We have no other way to target only JVM or JS projects in tests. */
-lazy val aggregatorIDs = Seq("core")
+lazy val aggregatorIDs = Seq("core", "integrationCirceV014")
 
-addCommandAlias("ci-jvm",     ";" + aggregatorIDs.map(id => s"${id}JVM/clean ;${id}JVM/Test/compile ;${id}JVM/test").mkString(";"))
+addCommandAlias("ci-jvm",     ";" + aggregatorIDs.map(id => s"${id}JVM/clean ;${id}JVM/Test/compile ;${id}JVM/test").mkString(";") + ";mimaReportBinaryIssues")
 addCommandAlias("ci-js",      ";" + aggregatorIDs.map(id => s"${id}JS/clean ;${id}JS/Test/compile ;${id}JS/test").mkString(";"))
 addCommandAlias("ci-doc",     ";unidoc ;site/makeMicrosite")
 addCommandAlias("ci",         ";project root ;reload ;+ci-jvm ;+ci-js ;+package ;ci-doc")
@@ -173,6 +174,22 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
     // Needed in order to publish for multiple Scala.js versions:
     // https://github.com/olafurpg/sbt-ci-release#how-do-i-publish-cross-built-scalajs-projects
     publish / skip := customScalaJSVersion.isDefined,
+    // Setup backwards compat testing
+    mimaPreviousArtifacts := Set("io.monix" %% name.value % "0.0.1"),
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.CoreScalaDoc"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.Newtype"),
+      ProblemFilters.exclude[IncompatibleResultTypeProblem]("monix.newtypes.Newtype.Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.Newtype$Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.Newtype$Tag"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeCovariantK"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeK"),
+      ProblemFilters.exclude[IncompatibleResultTypeProblem]("monix.newtypes.NewtypeK.Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.NewtypeK$Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.NewtypeK$Tag"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeValidated"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeWrapped"),
+    )
   )
 
   pr.configure(defaultPlugins)
@@ -187,6 +204,7 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
 
 lazy val root = project.in(file("."))
   .enablePlugins(ScalaUnidocPlugin)
+  .disablePlugins(MimaPlugin)
   .aggregate(coreJVM, coreJS)
   .configure(defaultPlugins)
   .settings(sharedSettings)
@@ -281,6 +299,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
   .configureCross(defaultCrossProjectConfiguration)
+  .jsConfigure(_.disablePlugins(MimaPlugin))
   .settings(
     name := "newtypes-core",
     libraryDependencies ++= Seq(

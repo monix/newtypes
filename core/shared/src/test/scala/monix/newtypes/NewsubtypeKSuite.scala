@@ -81,7 +81,7 @@ object NewsubtypeKSuite {
 
   object Nel extends NewsubtypeK[List] {
     def apply[A](head: A, tail: A*): Nel[A] =
-      unsafeBuild(head :: tail.toList)
+      unsafeCoerce(head :: tail.toList)
 
     def unapply[F[_], A](list: F[A])(implicit ev: F[A] =:= Nel[A]): Some[(A, List[A])] = {
       val l = value(list)

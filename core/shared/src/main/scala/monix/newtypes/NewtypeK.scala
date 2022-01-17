@@ -30,7 +30,7 @@ package monix.newtypes
   *
   *   object Nel extends NewtypeK[List] { 
   *     def apply[A](head: A, tail: A*): Nel[A] = 
-  *       unsafeBuild(head :: tail.toList)
+  *       unsafeCoerce(head :: tail.toList)
   *
   *     def unapply[F[_], A](list: F[A])(
   *       implicit ev: F[A] =:= Nel[A]
@@ -65,7 +65,7 @@ abstract class NewtypeK[Src[_]] extends NewtypeTraitK[Src]
   *
   *   object NonEmptyList extends NewtypeCovariantK[List] { 
   *     def apply[A](head: A, tail: A*): NonEmptyList[A] = 
-  *       unsafeBuild(head :: tail.toList)
+  *       unsafeCoerce(head :: tail.toList)
   *
   *     def unapply[F[_], A](list: F[A])(
   *       implicit ev: F[A] =:= NonEmptyList[A]
