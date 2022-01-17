@@ -73,7 +73,9 @@ lazy val sharedSettings = Seq(
     // absolute path of the source file, the absolute path of that file
     // will be put into the FILE_SOURCE variable, which is
     // definitely not what we want.
-    "-sourcepath", file(".").getAbsolutePath.replaceAll("[.]$", "")
+    "-sourcepath", file(".").getAbsolutePath.replaceAll("[.]$", ""),
+    // Debug warnings
+    "-Wconf:any:warning-verbose",
   ),
 
   // https://github.com/sbt/sbt/issues/2654
@@ -296,9 +298,9 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
         )
     }),
     // Activates doc testing
-    // doctestTestFramework := DoctestTestFramework.ScalaTest,
-    // doctestScalaTestVersion := Some(ScalaTestVersion),
-    // doctestOnlyCodeBlocksMode := true,
+     doctestTestFramework := DoctestTestFramework.ScalaTest,
+     doctestScalaTestVersion := Some(ScalaTestVersion),
+     doctestOnlyCodeBlocksMode := true,
   )
 
 lazy val coreJVM = core.jvm

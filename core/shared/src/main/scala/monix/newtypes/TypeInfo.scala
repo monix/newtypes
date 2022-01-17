@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 
 package monix.newtypes
 
-import scala.annotation.unused
+import scala.annotation.nowarn
 import scala.reflect.ClassTag
 import java.util.regex.Pattern
 
@@ -38,7 +38,7 @@ final case class TypeInfo[T](
 object TypeInfo extends TypeInfoLevel0 {
   def of[T](implicit ev: TypeInfo[T]): TypeInfo[T] = ev
 
-  def of[T](@unused value: T)(implicit ev: TypeInfo[T]): TypeInfo[T] = ev
+  def of[T](@nowarn value: T)(implicit ev: TypeInfo[T]): TypeInfo[T] = ev
 
   implicit def forClassesK1[T[_], A](implicit
     a: TypeInfo[A],

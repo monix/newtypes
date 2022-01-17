@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ package monix.newtypes
   *       if (v.contains("@"))
   *         Right(unsafeBuild(v))
   *       else
-  *         Left(BuildFailure(EmailAddress, v, Some("missing @")))
+  *         Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
   *   }
   * }}}
   */
@@ -42,12 +42,12 @@ abstract class NewtypeValidated[Src] extends Newtype[Src] with NewValidated[Src]
   * Example: {{{
   *   type EmailAddress = EmailAddress.Type
   *
-  *   object EmailAddress extends NewsubtypeValidated[String, Exception] {
+  *   object EmailAddress extends NewsubtypeValidated[String] {
   *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
   *       if (v.contains("@"))
   *         Right(unsafeBuild(v))
   *       else
-  *         Left(BuildFailure(EmailAddress, v, Some("missing @")))
+  *         Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
   *   }
   * }}}
   */
