@@ -189,6 +189,14 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
       ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.NewtypeK$Tag"),
       ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeValidated"),
       ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeWrapped"),
+      // Scala 3  — these are now inherited:
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.Newtype.value"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.Newtype.unsafeCoerce"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.Newtype.derive"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.value"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.unsafeCoerce"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.derive"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.deriveK")
     )
   )
 

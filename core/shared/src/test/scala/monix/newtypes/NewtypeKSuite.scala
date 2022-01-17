@@ -28,6 +28,7 @@ class NewtypeKSuite extends AnyFunSuite {
   test("it compiles") {
     val n: Nel[String] = Nel("Alex", "John")
     assert(n.value == List("Alex", "John"))
+    assert(Nel.value(n) == n.value)
   }
 
   test("newtype is not 'translucent'") {
