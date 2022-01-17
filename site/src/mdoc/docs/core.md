@@ -279,7 +279,7 @@ With `NewtypeK` and `NewtypeCovariantK` you have to provide the `apply`, `unappl
 
 [Newsubtype]({{ site.api_baseurl }}/io/monix/newtypes/Newsubtype.html) exposes the base encoding for new-subtypes over types with no type parameters. It functions exactly the same as `Newtype`, except as a subtype of the underlying type instead of as an entirely new type.
 
-It provides the same utility classes as [Newtype](#newtype), including `NewsubtypeWrapped`, `NewsubtypeValidated`, `NewsubtypeK`, and `NewsubtypeCovariantK`.
+It provides the same utility classes as [Newtype](#newtype), including [NewsubtypeWrapped]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeWrapped.html), [NewsubtypeValidated]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeValidated.html), [NewsubtypeK]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeK.html), and [NewsubtypeCovariantK]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeCovariantK.html).
 
 There are two core benefits of `Newsubtype` and its variants:
 1. `Newsubtype`s of primitives are unboxed in scala 2 (in scala 3 both should be unboxed as expected).
@@ -289,7 +289,7 @@ That said, unless you know you need `Newsubtype`, you're likely better off livin
 
 `Newsubtype`s don't need to declare forwarding methods or reimplement any methods on their underlying types:
 
-```scala mdoc:reset:silent
+```scala mdoc:reset
 import monix.newtypes._
 
 type Level = Level.Type
@@ -307,7 +307,8 @@ val anotherLevel: Int = myLevel + 1
 The likely desired result type doesn't work:
 
 ```scala mdoc:fail:silent
-val newLevel: Level = level + 1
+// ERROR — should fail at compile-time
+val newLevel: Level = myLevel + 1
 ```
 
 We would need to re-wrap our results, which could be prohibitively expensive depending on the validation logic on the `Newsubtype`:
