@@ -320,3 +320,48 @@ val newLevel: Level = Level(myLevel + 1)
 
 ## Encoders and Decoders
 
+You can automatically derive encoders based on `HasExtractor` instances.
+All newtypes have a `HasExtractor` instance defined.
+
+Here's how to automatically derive `io.circe.Encoder`:
+
+```scala mdoc:reset:silent
+import monix.newtypes._
+import io.circe._
+
+implicit def jsonEncoder[T, S](implicit 
+  extractor: HasExtractor.Aux[T, S],
+  enc: Encoder[S],
+): Encoder[T] = {
+  (t: T) => enc.apply(extractor.extract(t))
+}
+```
+
+And you can also derive decoders, based on `HasBuilder` instances.
+Here's how to automatically derive `io.circe.Decoder` (validation
+included):
+
+```scala mdoc:silent
+implicit def jsonDecoder[T, S](implicit 
+  builder: HasBuilder.Aux[T, S],
+  dec: Decoder[S],
+): Decoder[T] = (c: HCursor) => {
+  dec.apply(c).flatMap { value =>
+    builder.build(value) match {
+      case value @ Right(_) => 
+        value.asInstanceOf[Either[DecodingFailure, T]]
+      case Left(failure) => 
+        val msg = failure.message.fold("")(m => s" — $m")
+        Left(DecodingFailure(
+          s"Invalid ${failure.typeInfo.typeLabel}$msg", 
+          c.history
+        ))
+    }
+  }
+}
+```
+
+You don't need to define such encoders and decoders, as they are
+already defined in the [Circe integration](./circe.md).
+
+But you can use `HasExtractor` and `HasBuilder` for new integrations.

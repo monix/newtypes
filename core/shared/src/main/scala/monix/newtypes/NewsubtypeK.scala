@@ -17,6 +17,14 @@
 
 package monix.newtypes
 
+/**
+  * Similar to [[NewtypeK]], except that the type created is a 
+  * sub-type.
+  */
 abstract class NewsubtypeK[Src[_]] extends NewsubtypeTraitK[Src]
 
+/**
+  * Similar to [[NewtypeCovariantK]], except that the type created
+  * is a sub-type.
+  */
 abstract class NewsubtypeCovariantK[Src[+_]] extends NewsubtypeCovariantTraitK[Src]

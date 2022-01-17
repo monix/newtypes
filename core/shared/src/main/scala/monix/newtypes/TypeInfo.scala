@@ -21,6 +21,11 @@ import scala.annotation.nowarn
 import scala.reflect.ClassTag
 import java.util.regex.Pattern
 
+/**
+  * `TypeInfo` values are used as replacement for `ClassTag`,
+  * to extract type info at compile-time (name, package) and 
+  * use that for debugging purposes (e.g. better error messages).
+  */
 final case class TypeInfo[T](
   typeName: String,
   typeLabel: String,

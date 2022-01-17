@@ -212,6 +212,7 @@ lazy val site = project.in(file("site"))
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
   .dependsOn(coreJVM)
+  .dependsOn(integrationCirceV014JVM)
   .settings {
     import microsites._
     Seq(
@@ -238,7 +239,10 @@ lazy val site = project.in(file("site"))
         "white-color" -> "#FFFFFF"
       ),
       // https://github.com/47degrees/github4s
-      libraryDependencies += "com.47deg" %% "github4s" % "0.29.1",
+      libraryDependencies ++= Seq(
+        "com.47deg" %% "github4s" % "0.29.1",
+        "io.circe" %%% "circe-parser" % CirceVersionV0_14,
+      ),
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
       micrositeExtraMdFilesOutput := (Compile / resourceManaged).value / "jekyll",

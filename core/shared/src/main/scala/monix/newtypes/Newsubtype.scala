@@ -18,6 +18,18 @@
 package monix.newtypes
 
 /**
-  * ???
+  * Like [[Newtype]], except as a subtype of the underlying type 
+  * instead of as an entirely new type.
+  * 
+  * {{{
+  *   type Level = Level.Type
+  *   object Level extends NewsubtypeWrapped[Int]
+  * 
+  *   val level1: Level = Level(1)
+  *   // This works too
+  *   val level2: Int = Level(2)
+  *   // This fails compilation
+  *   // val level3: Level = 3
+  * }}}
   */
 abstract class Newsubtype[Src] extends NewsubtypeTrait[Src]
