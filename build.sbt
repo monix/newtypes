@@ -24,6 +24,7 @@ val Scala213 = "2.13.6"
 val Scala3   = "3.1.0"
 
 val CatsVersion        = "2.6.1"
+val CirceVersionV0_14  = "0.14.1"
 val ScalaTestVersion   = "3.2.9"
 val Shapeless2xVersion = "2.3.3"
 val Shapeless3xVersion = "3.0.2"
@@ -298,10 +299,33 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
         )
     }),
     // Activates doc testing
-     doctestTestFramework := DoctestTestFramework.ScalaTest,
-     doctestScalaTestVersion := Some(ScalaTestVersion),
-     doctestOnlyCodeBlocksMode := true,
+    doctestTestFramework := DoctestTestFramework.ScalaTest,
+    doctestScalaTestVersion := Some(ScalaTestVersion),
+    doctestOnlyCodeBlocksMode := true,
   )
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+
+// ---
+lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("integration-circe-v0.14"))
+  .configureCross(defaultCrossProjectConfiguration)
+  .dependsOn(core)
+  .settings(
+    name := "newtypes-circe-v0.14",
+    libraryDependencies ++= Seq(
+      // https://circe.github.io/circe/
+      "io.circe" %%% "circe-core" % CirceVersionV0_14,
+      "io.circe" %%% "circe-parser" % CirceVersionV0_14 % Test,
+      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+    ),
+    // Activates doc testing
+    doctestTestFramework := DoctestTestFramework.ScalaTest,
+    doctestScalaTestVersion := Some(ScalaTestVersion),
+    doctestOnlyCodeBlocksMode := true,
+  )
+
+lazy val integrationCirceV014JVM = integrationCirceV014.jvm
+lazy val integrationCirceV014JS  = integrationCirceV014.js
