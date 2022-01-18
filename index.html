@@ -8,17 +8,22 @@
 
 <p>The packages are published on Maven Central.</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">libraryDependencies</span> <span class="o">+=</span> <span class="s">"io.monix"</span> <span class="o">%%</span> <span class="s">"newtypes-core"</span> <span class="o">%</span> <span class="s">"0.0.1"</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">libraryDependencies</span> <span class="o">++=</span> <span class="nc">Seq</span><span class="o">(</span>
+  <span class="s">"io.monix"</span> <span class="o">%%</span> <span class="s">"newtypes-core"</span> <span class="o">%</span> <span class="s">"0.1.0"</span><span class="o">,</span>
+  <span class="c1">// Circe integration (optional) ...</span>
+  <span class="s">"io.monix"</span> <span class="o">%%</span> <span class="s">"newtypes-circe-v0.14"</span> <span class="o">%</span> <span class="s">"0.1.0"</span><span class="o">,</span>
+<span class="o">)</span>
 </code></pre></div></div>
 
-<h3 id="links">Links</h3>
+<h3 id="documentation">Documentation</h3>
 
 <ul>
   <li><a href="https://newtypes.monix.io/api/">ScalaDoc API</a></li>
-  <li><a href="https://newtypes.monix.io/docs/">Documentation</a>
+  <li><a href="https://newtypes.monix.io/docs/">Website</a>
     <ul>
       <li><a href="https://newtypes.monix.io/docs/motivation.html">Motivation</a></li>
       <li><a href="https://newtypes.monix.io/docs/core.html">Defining Newtypes</a></li>
+      <li><a href="https://newtypes.monix.io/docs/circe.html">Circe JSON integration</a></li>
     </ul>
   </li>
 </ul>
