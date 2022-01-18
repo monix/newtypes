@@ -252,6 +252,9 @@ lazy val site = project.in(file("site"))
       micrositeConfigYaml := ConfigYml(
         yamlPath = Some((Compile / resourceDirectory).value / "microsite" / "_config.yml")
       ),
+      makeSite / mappings ++= Seq(
+        ((Compile / resourceDirectory).value / "microsite" / "CNAME") -> "CNAME",
+      ),
       micrositeExtraMdFiles := Map(
         file("README.md") -> ExtraMdFileConfig("index.md", "page", Map("title" -> "Home", "section" -> "home", "position" -> "100")),
         file("CHANGELOG.md") -> ExtraMdFileConfig("CHANGELOG.md", "page", Map("title" -> "Change Log", "section" -> "changelog", "position" -> "110")),
