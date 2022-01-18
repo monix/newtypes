@@ -21,6 +21,7 @@ val Scala3   = "3.1.0"
 
 val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
+val PureConfigV0_17    = "0.17.1"
 val ScalaTestVersion   = "3.2.10"
 val Shapeless2xVersion = "2.3.3"
 val Shapeless3xVersion = "3.0.2"
@@ -188,6 +189,8 @@ lazy val root = project.in(file("."))
     coreJS, 
     integrationCirceV014JVM,
     integrationCirceV014JS,
+    integrationPureConfigV017JVM,
+    integrationPureConfigV017JS,
   )
   .configure(defaultPlugins)
   .settings(sharedSettings)
@@ -216,6 +219,7 @@ lazy val site = project.in(file("site"))
   .settings(doNotPublishArtifact)
   .dependsOn(coreJVM)
   .dependsOn(integrationCirceV014JVM)
+  .dependsOn(integrationPureConfigV017JVM)
   .settings {
     import microsites._
     Seq(
@@ -245,6 +249,7 @@ lazy val site = project.in(file("site"))
       libraryDependencies ++= Seq(
         "com.47deg" %% "github4s" % "0.29.1",
         "io.circe" %%% "circe-parser" % CirceVersionV0_14,
+        "com.github.pureconfig" %%% "pureconfig" % PureConfigV0_17,
       ),
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
@@ -353,3 +358,37 @@ lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
 
 lazy val integrationCirceV014JVM = integrationCirceV014.jvm
 lazy val integrationCirceV014JS  = integrationCirceV014.js
+
+// -----
+def pureConfigSharedSettings(ver: String) = 
+  Seq(
+    libraryDependencies ++= Seq(
+      "com.github.pureconfig" %% "pureconfig" % ver,
+      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+    ),  
+  ) ++ Seq(Compile, Test).map { sc =>
+    (sc / unmanagedSourceDirectories) ++= {
+      val base = baseDirectory.value
+      val jvmOrJs = base.getName
+      val mainOrTest = sc match { case Compile => "main"; case Test => "test" }
+      val rootDir = baseDirectory.value.getParentFile().getParentFile
+      Seq(
+        rootDir / "all" / "shared" / "src" / mainOrTest / "scala",
+        rootDir / "all" / jvmOrJs / "src" / mainOrTest / "scala",
+      )
+    }
+  }
+
+lazy val integrationPureConfigV017 = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("integration-pureconfig/v0.17"))
+  .jsConfigure(_.disablePlugins(MimaPlugin))
+  .configureCross(defaultCrossProjectConfiguration)
+  .dependsOn(core)
+  .settings(pureConfigSharedSettings(PureConfigV0_17))
+  .settings(
+    name := "newtypes-pureconfig-v0.17",
+  )
+
+lazy val integrationPureConfigV017JVM = integrationPureConfigV017.jvm
+lazy val integrationPureConfigV017JS  = integrationPureConfigV017.js
