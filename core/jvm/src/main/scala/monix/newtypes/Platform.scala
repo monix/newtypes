@@ -17,10 +17,32 @@
 
 package monix.newtypes
 
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.MethodType
+import java.{util => ju}
+import scala.util.control.NonFatal
+
 private[newtypes] object Platform {
   def getPackageName(cls: Class[_]): String =
-    cls.getPackageName
+    if (getPackageName != null) {
+      getPackageName
+        .invokeWithArguments(ju.Arrays.asList(cls))
+        .asInstanceOf[String]
+    } else {
+      cls.getName.replaceAll("^(.*?)\\.[^.]+$", "$1")
+    }
 
   def getTypeParamsCount(cls: Class[_]): Int =
     cls.getTypeParameters.length
+
+  private[this] val getPackageName =
+    try {
+      val publicLookup = MethodHandles.publicLookup()
+      val mt = MethodType.methodType(classOf[String])
+      publicLookup.findVirtual(classOf[Class[_]], "getPackageName", mt)
+    } catch {
+      case _: NoSuchMethodException | _: SecurityException | 
+        _: NullPointerException | _: IllegalAccessException | NonFatal(_) =>
+        null
+    }
 }
