@@ -11,3 +11,7 @@ options:
       - title: Defining Newtypes
         url: docs/core.html
         menu_section: docs
+
+      - title: Circe JSON Integration
+        url: docs/circe.html
+        menu_section: docs

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ class NewtypeKSuite extends AnyFunSuite {
   test("it compiles") {
     val n: Nel[String] = Nel("Alex", "John")
     assert(n.value == List("Alex", "John"))
+    assert(Nel.value(n) == n.value)
   }
 
   test("newtype is not 'translucent'") {
@@ -82,7 +83,7 @@ object NewtypeKSuite {
 
   object Nel extends NewtypeK[List] {
     def apply[A](head: A, tail: A*): Nel[A] =
-      unsafeBuild(head :: tail.toList)
+      unsafeCoerce(head :: tail.toList)
 
     def unapply[F[_], A](list: F[A])(implicit ev: F[A] =:= Nel[A]): Some[(A, List[A])] = {
       val l = value(list)

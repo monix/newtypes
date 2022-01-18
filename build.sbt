@@ -3,14 +3,15 @@ import Boilerplate._
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
+import com.typesafe.tools.mima.core._
 
 // ---------------------------------------------------------------------------
 // Commands
 
 /* We have no other way to target only JVM or JS projects in tests. */
-lazy val aggregatorIDs = Seq("core")
+lazy val aggregatorIDs = Seq("core", "integrationCirceV014")
 
-addCommandAlias("ci-jvm",     ";" + aggregatorIDs.map(id => s"${id}JVM/clean ;${id}JVM/Test/compile ;${id}JVM/test").mkString(";"))
+addCommandAlias("ci-jvm",     ";" + aggregatorIDs.map(id => s"${id}JVM/clean ;${id}JVM/Test/compile ;${id}JVM/test").mkString(";") + ";mimaReportBinaryIssues")
 addCommandAlias("ci-js",      ";" + aggregatorIDs.map(id => s"${id}JS/clean ;${id}JS/Test/compile ;${id}JS/test").mkString(";"))
 addCommandAlias("ci-doc",     ";unidoc ;site/makeMicrosite")
 addCommandAlias("ci",         ";project root ;reload ;+ci-jvm ;+ci-js ;+package ;ci-doc")
@@ -19,12 +20,13 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala212 = "2.12.14"
-val Scala213 = "2.13.6"
-val Scala3   = "3.0.2"
+val Scala212 = "2.12.15"
+val Scala213 = "2.13.8"
+val Scala3   = "3.1.0"
 
-val CatsVersion        = "2.6.1"
-val ScalaTestVersion   = "3.2.9"
+val CatsVersion        = "2.7.0"
+val CirceVersionV0_14  = "0.14.1"
+val ScalaTestVersion   = "3.2.10"
 val Shapeless2xVersion = "2.3.3"
 val Shapeless3xVersion = "3.0.2"
 
@@ -58,7 +60,7 @@ lazy val sharedSettings = Seq(
   Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
 
   // Turning off fatal warnings and certain annoyances during testing
-  Test / scalacOptions ~= (_ filterNot (Set( 
+  Test / scalacOptions ~= (_ filterNot (Set(
     "-Xfatal-warnings",
     "-Werror",
     "-Ywarn-value-discard",
@@ -73,7 +75,9 @@ lazy val sharedSettings = Seq(
     // absolute path of the source file, the absolute path of that file
     // will be put into the FILE_SOURCE variable, which is
     // definitely not what we want.
-    "-sourcepath", file(".").getAbsolutePath.replaceAll("[.]$", "")
+    "-sourcepath", file(".").getAbsolutePath.replaceAll("[.]$", ""),
+    // Debug warnings
+    "-Wconf:any:warning-verbose",
   ),
 
   // https://github.com/sbt/sbt/issues/2654
@@ -170,6 +174,30 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
     // Needed in order to publish for multiple Scala.js versions:
     // https://github.com/olafurpg/sbt-ci-release#how-do-i-publish-cross-built-scalajs-projects
     publish / skip := customScalaJSVersion.isDefined,
+    // Setup backwards compat testing
+    mimaPreviousArtifacts := Set("io.monix" %% name.value % "0.0.1"),
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.CoreScalaDoc"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.Newtype"),
+      ProblemFilters.exclude[IncompatibleResultTypeProblem]("monix.newtypes.Newtype.Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.Newtype$Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.Newtype$Tag"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeCovariantK"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeK"),
+      ProblemFilters.exclude[IncompatibleResultTypeProblem]("monix.newtypes.NewtypeK.Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.NewtypeK$Ops"),
+      ProblemFilters.exclude[MissingClassProblem]("monix.newtypes.NewtypeK$Tag"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeValidated"),
+      ProblemFilters.exclude[MissingTypesProblem]("monix.newtypes.NewtypeWrapped"),
+      // Scala 3  — these are now inherited:
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.Newtype.value"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.Newtype.unsafeCoerce"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.Newtype.derive"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.value"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.unsafeCoerce"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.derive"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("monix.newtypes.NewtypeK.deriveK")
+    )
   )
 
   pr.configure(defaultPlugins)
@@ -184,6 +212,7 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
 
 lazy val root = project.in(file("."))
   .enablePlugins(ScalaUnidocPlugin)
+  .disablePlugins(MimaPlugin)
   .aggregate(coreJVM, coreJS)
   .configure(defaultPlugins)
   .settings(sharedSettings)
@@ -209,6 +238,7 @@ lazy val site = project.in(file("site"))
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
   .dependsOn(coreJVM)
+  .dependsOn(integrationCirceV014JVM)
   .settings {
     import microsites._
     Seq(
@@ -235,7 +265,10 @@ lazy val site = project.in(file("site"))
         "white-color" -> "#FFFFFF"
       ),
       // https://github.com/47degrees/github4s
-      libraryDependencies += "com.47deg" %% "github4s" % "0.29.1",
+      libraryDependencies ++= Seq(
+        "com.47deg" %% "github4s" % "0.29.1",
+        "io.circe" %%% "circe-parser" % CirceVersionV0_14,
+      ),
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
       micrositeExtraMdFilesOutput := (Compile / resourceManaged).value / "jekyll",
@@ -274,6 +307,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
   .configureCross(defaultCrossProjectConfiguration)
+  .jsConfigure(_.disablePlugins(MimaPlugin))
   .settings(
     name := "newtypes-core",
     libraryDependencies ++= Seq(
@@ -303,3 +337,26 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+
+// ---
+lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("integration-circe-v0.14"))
+  .configureCross(defaultCrossProjectConfiguration)
+  .dependsOn(core)
+  .settings(
+    name := "newtypes-circe-v0.14",
+    libraryDependencies ++= Seq(
+      // https://circe.github.io/circe/
+      "io.circe" %%% "circe-core" % CirceVersionV0_14,
+      "io.circe" %%% "circe-parser" % CirceVersionV0_14 % Test,
+      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+    ),
+    // Activates doc testing
+    doctestTestFramework := DoctestTestFramework.ScalaTest,
+    doctestScalaTestVersion := Some(ScalaTestVersion),
+    doctestOnlyCodeBlocksMode := true,
+  )
+
+lazy val integrationCirceV014JVM = integrationCirceV014.jvm
+lazy val integrationCirceV014JS  = integrationCirceV014.js

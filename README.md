@@ -9,15 +9,20 @@ Macro-free helpers for defining newtypes in Scala, cross-compiled to Scala 3.
 The packages are published on Maven Central.
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "0.0.1"
+libraryDependencies ++= Seq(
+  "io.monix" %% "newtypes-core" % "0.1.0",
+  // Circe integration (optional) ...
+  "io.monix" %% "newtypes-circe-v0.14" % "0.1.0",
+)
 ```
 
-### Links
+### Documentation
 
 - [ScalaDoc API](https://newtypes.monix.io/api/)
-- [Documentation](https://newtypes.monix.io/docs/)
+- [Website](https://newtypes.monix.io/docs/)
   - [Motivation](https://newtypes.monix.io/docs/motivation.html)
   - [Defining Newtypes](https://newtypes.monix.io/docs/core.html)
+  - [Circe JSON integration](https://newtypes.monix.io/docs/circe.html)
 
 ## Acknowledgements
 

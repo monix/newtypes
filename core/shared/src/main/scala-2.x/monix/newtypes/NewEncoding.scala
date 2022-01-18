@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,14 @@
 
 package monix.newtypes
 
-/** $newsubtypeBaseDescription */
-abstract class Newsubtype[Src] extends CoreScalaDoc {
-  type Base = Src
+import scala.reflect.ClassTag
+
+/**
+  * Scala 2 specific encoding for new-types — common trait to use
+  * in [[monix.newtypes.Newtype]] and [[monix.newtypes.Newsubtype]].
+  */
+private trait NewEncoding[Src] {
+  type Base
   trait Tag extends Any
   type Type <: Base with Tag
 
@@ -27,24 +32,39 @@ abstract class Newsubtype[Src] extends CoreScalaDoc {
     x.asInstanceOf[Src]
 
   implicit final class Ops(val self: Type) {
-    @inline def value: Src = Newsubtype.this.value(self)
+    @inline def value: Src = NewEncoding.this.value(self)
   }
 
   @inline protected final def extract(value: Type): Src =
     value.asInstanceOf[Src]
 
-  @inline protected final def unsafeBuild(value: Src): Type =
+  @inline protected final def unsafeCoerce(value: Src): Type =
     value.asInstanceOf[Type]
 
   @inline protected final def derive[F[_]](implicit ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  protected def typeName: String =
-    getClass().getSimpleName().replaceFirst("[$]$", "")
+  implicit val typeInfo: TypeInfo[Type] = {
+    val raw = TypeInfo.forClasses(ClassTag(getClass))
+    TypeInfo(
+      typeName = raw.typeName.replaceFirst("[$]$", ""),
+      typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
+      packageName = raw.packageName,
+      typeParams = Nil
+    )
+  }
 
-  implicit final val extractor: NewExtractor.Aux[Type, Src] =
-    new NewExtractor[Type] {
+  implicit final val extractor: HasExtractor.Aux[Type, Src] =
+    new HasExtractor[Type] {
       type Source = Src
-      def extract(value: Type) = value.value
+      def extract(value: Type): Src = value.value
     }
+}
+
+private[newtypes] trait NewsubtypeTrait[Src] extends NewEncoding[Src] {
+  override type Base = Src
+}
+
+private[newtypes] trait NewtypeTrait[Src] extends NewEncoding[Src] {
+  override type Base = Any { type NewType$base }
 }

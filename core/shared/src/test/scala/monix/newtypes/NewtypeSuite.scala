@@ -21,8 +21,8 @@ import cats.Eq
 import org.scalatest.funsuite.AnyFunSuite
 import monix.newtypes.TestUtils.illTyped
 
-class NewtypeWrappedSuite extends AnyFunSuite {
-  import NewtypeWrappedSuite._
+class NewtypeSuite extends AnyFunSuite {
+  import NewtypeSuite._
 
   test("it compiles") {
     val n: MyName = MyName("Alex")
@@ -45,40 +45,14 @@ class NewtypeWrappedSuite extends AnyFunSuite {
   test("derive") {
     assert(Eq[MyName].eqv(MyName("Alex"), MyName("Alex")))
   }
-
-  test("unapply") {
-    val n = MyName("Alex")
-    n match {
-      case ref @ MyName(src) =>
-        assert(ref === n)
-        assert(src === n.value)
-    }
-
-    illTyped(
-      """
-      "Alex" match { case MyName(_) => () }
-      """
-    )
-
-    illTyped(
-      """
-      (1: Any) match { case MyName(_) => () }
-      """
-    )
-
-    illTyped(
-      """
-      (MyName("Alex"): Any) match { case MyName(_) => () }
-      """
-    )
-  }
 }
 
-object NewtypeWrappedSuite {
+object NewtypeSuite {
   import cats.implicits._
 
   type MyName = MyName.Type
-  object MyName extends NewtypeWrapped[String] {
+  object MyName extends Newtype[String] {
+    def apply(value: String) = unsafeCoerce(value)
     implicit val eq: Eq[MyName] = derive
   }
 }

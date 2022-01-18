@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@ class NewsubtypeWrappedSuite extends AnyFunSuite {
 
   test("newsubtype is 'translucent'") {
     val n: String = YourName("Alex")
+    assert(n == "Alex")
   }
 
   test("newsubtype is type-safe") {

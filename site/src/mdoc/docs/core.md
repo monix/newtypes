@@ -19,6 +19,7 @@ libraryDependencies += "io.monix" %% "newtypes-core" % "<version>"
   - [Deriving type-class instances](#deriving-type-class-instances)
 - [NewtypeK and NewtypeCovariantK](#newtypek-and-newtypecovariantk)
 - [Newsubtype](#newsubtype)
+- [Encoders and Decoders](#encoders-and-decoders)
 
 ## Newtype
 
@@ -32,7 +33,7 @@ type EmailAddress = EmailAddress.Type
 object EmailAddress extends Newtype[String] {
   def apply(value: String): Option[EmailAddress] =
     if (value.contains("@"))
-      Some(unsafeBuild(value))
+      Some(unsafeCoerce(value))
     else
       None
 
@@ -121,12 +122,12 @@ import monix.newtypes._
 
 type EmailAddress = EmailAddress.Type
 
-object EmailAddress extends NewtypeValidated[String, Exception] {
-  def apply(v: String): Either[Exception, EmailAddress] =
+object EmailAddress extends NewtypeValidated[String] {
+  def apply(v: String): Either[BuildFailure[String], EmailAddress] =
     if (v.contains("@")) 
-      Right(unsafeBuild(v))
+      Right(unsafeCoerce(v))
     else 
-      Left(new IllegalArgumentException("Not a valid email"))
+      Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
 }
 ```
 
@@ -222,7 +223,7 @@ type NonEmptyList[A] = NonEmptyList.Type[A]
 object NonEmptyList extends NewtypeCovariantK[List] {
   // Builder forces at least one element
   def apply[A](head: A, tail: A*): NonEmptyList[A] =
-    unsafeBuild(head :: tail.toList)
+    unsafeCoerce(head :: tail.toList)
 
   // Exposes (head, tail)
   def unapply[F[_], A](list: F[A])(
@@ -272,11 +273,11 @@ NonEmptyList(Option("Red"), Option("Green"), Option("Blue"))
   .sequence
 ```
 
-With `NewtypeK` and `NewtypeCovariantK` you have to provide the `apply`, `unapply`, and other utilities by youself. Which makes sense, as these are more complex types to deal with.
+With `NewtypeK` and `NewtypeCovariantK` you have to provide the `apply`, `unapply`, and other utilities by yourself. Which makes sense, as these are more complex types to deal with.
 
 ## Newsubtype
 
-[Newsubtype]({{ site.api_baseurl }}/io/monix/newtypes/Newsubtype.html) exposes the base encoding for newsubtypes over types with no type parameters. It functions exactly the same as `Newtype`, except as a subtype of the underlying type instead of as an entirely new type.
+[Newsubtype]({{ site.api_baseurl }}/io/monix/newtypes/Newsubtype.html) exposes the base encoding for new-subtypes over types with no type parameters. It functions exactly the same as `Newtype`, except as a subtype of the underlying type instead of as an entirely new type.
 
 It provides the same utility classes as [Newtype](#newtype), including [NewsubtypeWrapped]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeWrapped.html), [NewsubtypeValidated]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeValidated.html), [NewsubtypeK]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeK.html), and [NewsubtypeCovariantK]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeCovariantK.html).
 
@@ -297,7 +298,7 @@ object Level extends NewsubtypeWrapped[Int]
 val myLevel: Level = Level(5)
 ```
 
-Thus we can do things like call `+` from `Int` on our new subtype, however this unwraps our result to `Int`:
+Thus, we can do things like call `+` from `Int` on our new subtype, however this unwraps our result to `Int`:
 
 ```scala mdoc
 val anotherLevel: Int = myLevel + 1
@@ -317,3 +318,51 @@ val newLevel: Level = Level(myLevel + 1)
 ```
 
 `Newsubtype` can unwrap in more subtle and potentially dangerous ways. As a simple and contrived example, instances of either of `Map[Level, Int]` or `List[Level]` have `apply` methods that can take our subtype `Level` but would return dramatically different results. If we were using the `Map` apply and someone else changed the data type to `List`, our code would continue to compile but silently produce invalid results. If our `Level` were a `Newtype` instead, code using the `List` `apply` method but expecting the `Map` `apply` would now fail at compile time.
+
+## Encoders and Decoders
+
+You can automatically derive encoders based on `HasExtractor` instances.
+All newtypes have a `HasExtractor` instance defined.
+
+Here's how to automatically derive `io.circe.Encoder`:
+
+```scala mdoc:reset:silent
+import monix.newtypes._
+import io.circe._
+
+implicit def jsonEncoder[T, S](implicit 
+  extractor: HasExtractor.Aux[T, S],
+  enc: Encoder[S],
+): Encoder[T] = {
+  (t: T) => enc.apply(extractor.extract(t))
+}
+```
+
+And you can also derive decoders, based on `HasBuilder` instances.
+Here's how to automatically derive `io.circe.Decoder` (validation
+included):
+
+```scala mdoc:silent
+implicit def jsonDecoder[T, S](implicit 
+  builder: HasBuilder.Aux[T, S],
+  dec: Decoder[S],
+): Decoder[T] = (c: HCursor) => {
+  dec.apply(c).flatMap { value =>
+    builder.build(value) match {
+      case value @ Right(_) => 
+        value.asInstanceOf[Either[DecodingFailure, T]]
+      case Left(failure) => 
+        val msg = failure.message.fold("")(m => s" — $m")
+        Left(DecodingFailure(
+          s"Invalid ${failure.typeInfo.typeLabel}$msg", 
+          c.history
+        ))
+    }
+  }
+}
+```
+
+You don't need to define such encoders and decoders, as they are
+already defined in the [Circe integration](./circe.md).
+
+But you can use `HasExtractor` and `HasBuilder` for new integrations.

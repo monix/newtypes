@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,26 +17,20 @@
 
 package monix.newtypes
 
-/** $newtypeBaseDescription */
-abstract class Newtype[Src] extends CoreScalaDoc {
-  opaque type Type = Src
+/**
+  * Type-class used for encoding types.
+  *
+  * Used for automatically deriving encoders (e.g. to JSON)
+  * for newtypes.
+  *
+  * @see [[HasBuilder]] for deriving decoders.
+  */
+trait HasExtractor[Type] {
+  type Source
 
-  extension (self: Type) {
-    inline final def value: Src = self
-  }
+  def extract(value: Type): Source
+}
 
-  protected inline final def unsafeBuild(value: Src): Type =
-    value
-
-  protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
-    ev
-
-  protected def typeName: String =
-    getClass().getSimpleName().replaceFirst("[$]$", "")
-    
-  implicit val codec: NewExtractor.Aux[Type, Src] =
-    new NewExtractor[Type] {
-      type Source = Src
-      def extract(value: Type) = Newtype.this.value(value)
-    }
+object HasExtractor {
+  type Aux[T, S] = HasExtractor[T] { type Source = S }
 }

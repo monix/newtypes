@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +17,12 @@
 
 package monix.newtypes
 
-/**
-  * Type-class.
-  */
-trait NewBuilder[NewT] {
-  type Source
+import scala.annotation.nowarn
 
-  def build(value: Source): Either[BuildFailure[Source], NewT]
+private[newtypes] object Platform {
+  def getPackageName(cls: Class[_]): String =
+    cls.getName.replaceAll("^(.*?)\\.[^.]+$", "$1")
+
+  def getTypeParamsCount(@nowarn cls: Class[_]): Int =
+    0
 }
-
-object NewBuilder {
-  type Aux[T, S] = NewBuilder[T] { type Source = S }
-
-  def apply[T](implicit ev: NewBuilder[T]) = ev
-}
-
-final case class BuildFailure[Source](
-  targetTypeName: String,
-  value: Source,
-)

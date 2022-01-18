@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 the Newtypes contributors.
+ * Copyright (c) 2021-2022 the Newtypes contributors.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,13 @@
 package monix.newtypes
 
 /**
-  * Type-class.
+  * Similar to [[NewtypeK]], except that the type created is a 
+  * sub-type.
   */
-trait NewExtractor[NewT] {
-  type Source
+abstract class NewsubtypeK[Src[_]] extends NewsubtypeTraitK[Src]
 
-  def extract(value: NewT): Source
-}
-
-object NewExtractor {
-  type Aux[T, S] = NewExtractor[T] { type Source = S }
-  
-  def apply[T](implicit ev: NewBuilder[T]) = ev
-}
+/**
+  * Similar to [[NewtypeCovariantK]], except that the type created
+  * is a sub-type.
+  */
+abstract class NewsubtypeCovariantK[Src[+_]] extends NewsubtypeCovariantTraitK[Src]
