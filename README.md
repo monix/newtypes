@@ -18,6 +18,7 @@ libraryDependencies += "io.monix" %% "newtypes-core" % "0.1.0"
 - [Documentation](https://newtypes.monix.io/docs/)
   - [Motivation](https://newtypes.monix.io/docs/motivation.html)
   - [Defining Newtypes](https://newtypes.monix.io/docs/core.html)
+  - [Circe JSON integration](https://newtypes.monix.io/docs/circe.html)
 
 ## Acknowledgements
 
