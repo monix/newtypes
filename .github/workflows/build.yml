@@ -9,7 +9,7 @@ on:
 
 jobs:
   tests:
-    name: Tests (scala ${{ matrix.scala }}, scala.js ${{ matrix.scalajs }}, jvm ${{ matrix.java }})
+    name: Unit tests (scala ${{ matrix.scala }}, scala.js ${{ matrix.scalajs }}, jvm ${{ matrix.java }})
     strategy:
       fail-fast: true      
       matrix:
@@ -39,7 +39,7 @@ jobs:
           SBT_COMMAND: ${{ matrix.command }}
 
   doc-tests:
-    name: Docs 
+    name: Docs tests 
     runs-on: ubuntu-20.04
 
     steps:
@@ -47,15 +47,6 @@ jobs:
       - uses: olafurpg/setup-scala@v11
         with:
           java-version: "adopt@1.11"
-
-      - name: Set up Ruby 2.7 (for microsite)
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: 2.7.x
-
-      - name: Install microsite dependencies
-        run: |
-          bundle install --system --gemfile=site/Gemfile
 
       - name: sbt ci-doc
         run: |

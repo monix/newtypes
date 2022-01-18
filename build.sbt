@@ -8,7 +8,7 @@ import sbtcrossproject.CrossProject
 // Commands
 
 addCommandAlias("ci-test",    ";clean;Test/compile;test;package")
-addCommandAlias("ci-doc",     ";unidoc ;site/makeMicrosite")
+addCommandAlias("ci-doc",     ";unidoc ;site/mdoc")
 addCommandAlias("ci",         ";project root ;reload ;+ci-test ;ci-doc")
 addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosite")
 
