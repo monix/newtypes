@@ -21,8 +21,6 @@ val Scala3   = "3.1.0"
 
 val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
-val CirceVersionV0_13  = "0.13.0"
-val CirceVersionV0_12  = "0.12.3"
 val ScalaTestVersion   = "3.2.10"
 val Shapeless2xVersion = "2.3.3"
 val Shapeless3xVersion = "3.0.2"
@@ -188,10 +186,6 @@ lazy val root = project.in(file("."))
   .aggregate(
     coreJVM, 
     coreJS, 
-    integrationCirceV012JVM,
-    integrationCirceV012JS,
-    integrationCirceV013JVM,
-    integrationCirceV013JS,
     integrationCirceV014JVM,
     integrationCirceV014JS,
   )
@@ -342,36 +336,6 @@ def circeSharedSettings(ver: String) =
       )
     }
   }
-
-lazy val integrationCirceV012 = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Full)
-  .in(file("integration-circe/v0.12"))
-  .jsConfigure(_.disablePlugins(MimaPlugin))
-  .configureCross(defaultCrossProjectConfiguration)
-  .dependsOn(core)
-  .settings(circeSharedSettings(CirceVersionV0_12))
-  .settings(
-    name := "newtypes-circe-v0.12",
-    crossScalaVersions := Seq(Scala212, Scala213),
-  )
-
-lazy val integrationCirceV012JVM = integrationCirceV014.jvm
-lazy val integrationCirceV012JS  = integrationCirceV014.js
-
-lazy val integrationCirceV013 = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Full)
-  .in(file("integration-circe/v0.13"))
-  .jsConfigure(_.disablePlugins(MimaPlugin))
-  .configureCross(defaultCrossProjectConfiguration)
-  .dependsOn(core)
-  .settings(circeSharedSettings(CirceVersionV0_13))
-  .settings(
-    name := "newtypes-circe-v0.13",
-    crossScalaVersions := Seq(Scala212, Scala213),
-  )
-
-lazy val integrationCirceV013JVM = integrationCirceV014.jvm
-lazy val integrationCirceV013JS  = integrationCirceV014.js
 
 lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)

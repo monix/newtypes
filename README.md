@@ -12,16 +12,9 @@ The packages are published on Maven Central.
 libraryDependencies += "io.monix" %% "newtypes-core" % "0.2.0"
 ```
 
-For the [Circe integration](https://newtypes.monix.io/docs/circe.html)
-multiple versions are supported:
+For the [Circe integration](https://newtypes.monix.io/docs/circe.html):
 
 ```scala
-// For Circe version 0.12.x
-libraryDependencies += "io.monix" %% "newtypes-circe-v0.12" % "0.2.0"
-
-// For Circe version 0.13.x
-libraryDependencies += "io.monix" %% "newtypes-circe-v0.13" % "0.2.0"
-
 // For Circe version 0.14.x
 libraryDependencies += "io.monix" %% "newtypes-circe-v0.14" % "0.2.0"
 ```
