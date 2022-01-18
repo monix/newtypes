@@ -8,6 +8,9 @@ title:  "Integration with Circe (JSON encoding/decoding)"
 Importing the dependency for Circe, depending on version:
 
 ```scala
+// For Circe version 0.12.x
+libraryDependencies += "io.monix" %% "newtypes-circe-v0.12" % "@VERSION@"
+
 // For Circe version 0.13.x
 libraryDependencies += "io.monix" %% "newtypes-circe-v0.13" % "@VERSION@"
 
