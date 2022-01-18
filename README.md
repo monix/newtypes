@@ -9,7 +9,7 @@ Macro-free helpers for defining newtypes in Scala, cross-compiled to Scala 3.
 The packages are published on Maven Central.
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "0.0.1"
+libraryDependencies += "io.monix" %% "newtypes-core" % "0.1.0"
 ```
 
 ### Links
