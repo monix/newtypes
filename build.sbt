@@ -56,6 +56,9 @@ lazy val sharedSettings = Seq(
   scalaVersion := Scala213,
   crossScalaVersions := Seq(Scala212, Scala213, Scala3),
 
+  // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
+  versionScheme := Some("early-semver"),
+
   // Turning off fatal warnings for doc generation
   Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
 
