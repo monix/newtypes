@@ -5,10 +5,14 @@ title:  "Integration with Circe (JSON encoding/decoding)"
 
 # Integration with Circe (JSON encoding/decoding)
 
-Importing the dependency for Circe version `0.14.x`:
+Importing the dependency for Circe, depending on version:
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-circe-v0.14" % "<version>"
+// For Circe version 0.13.x
+libraryDependencies += "io.monix" %% "newtypes-circe-v0.13" % "@VERSION@"
+
+// For Circe version 0.14.x
+libraryDependencies += "io.monix" %% "newtypes-circe-v0.14" % "@VERSION@"
 ```
 
 Usage:
@@ -19,11 +23,11 @@ import monix.newtypes.integrations.DerivedCirceCodec
 
 type Email = Email.Type
 object Email extends NewtypeValidated[String] with DerivedCirceCodec {
-  def apply(v: String): Either[BuildFailure[String], Email] =
+  def apply(v: String): Either[BuildFailure[Type], Type] =
     if (v.contains("@")) 
       Right(unsafeCoerce(v))
     else 
-      Left(BuildFailure(TypeInfo.of[Email], v, Some("missing @")))
+      Left(BuildFailure("missing @"))
 }
 ```
 

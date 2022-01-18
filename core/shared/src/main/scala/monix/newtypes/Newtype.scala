@@ -27,7 +27,7 @@ package monix.newtypes
   *   type EmailAddress = EmailAddress.Type
   *
   *   object EmailAddress extends Newtype[String] { self =>
-  *     def apply(value: String): Option[EmailAddress] = 
+  *     def apply(value: String): Option[Type] = 
   *       if (value.contains("@")) 
   *         Some(unsafeCoerce(value)) 
   *       else 
@@ -39,12 +39,12 @@ package monix.newtypes
   *       new HasBuilder[EmailAddress] {
   *         type Source = String
   * 
-  *         def build(v: String): Either[BuildFailure[String], EmailAddress] =
+  *         def build(v: String): Either[BuildFailure[Type], Type] =
   *           apply(v) match {
   *             case Some(r) => 
   *               Right(r)
   *             case None => 
-  *               Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
+  *               Left(BuildFailure[EmailAddress]("missing @"))
   *           }
   *       }
   *   } 

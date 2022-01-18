@@ -7,7 +7,7 @@ position: 105
 The packages are published on Maven Central:
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "<version>"
+libraryDependencies += "io.monix" %% "newtypes-core" % "@VERSION@"
 ```
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13)

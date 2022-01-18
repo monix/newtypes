@@ -33,20 +33,20 @@ class NewtypeCirceCodecSuite extends AnyFunSuite {
   }
 
   test("NewtypeValidated has JSON codec") {
-    Email("noreply@alexn.org") match {
+    EmailAddress("noreply@alexn.org") match {
       case Left(failure) =>
         fail(failure.toString())
       case Right(value) =>
         val json = value.asJson.noSpaces
-        val received = parser.parse(json).flatMap(_.as[Email])
+        val received = parser.parse(json).flatMap(_.as[EmailAddress])
         assert(received == Right(value))
     }
   }
 
   test("NewtypeValidated decoder does validation") {
-    val value = parser.parse("\"Not an email\"").flatMap(_.as[Email])
+    val value = parser.parse("\"Not an email\"").flatMap(_.as[EmailAddress])
     assert(value.isLeft)
-    assert(value.left.map(_.getMessage()) == Left("Invalid Email — Not an email address"))
+    assert(value.left.map(_.getMessage()) == Left("Invalid EmailAddress — Not an email address"))
   }
 }
 
@@ -54,10 +54,10 @@ object NewtypeCirceCodecSuite {
   type FirstName = FirstName.Type
   object FirstName extends NewtypeWrapped[String] with DerivedCirceCodec
 
-  type Email = Email.Type
-  object Email extends NewtypeValidated[String] with DerivedCirceCodec {
-    def apply(value: String): Either[BuildFailure[String],Type] = 
+  type EmailAddress = EmailAddress.Type
+  object EmailAddress extends NewtypeValidated[String] with DerivedCirceCodec {
+    def apply(value: String): Either[BuildFailure[Type], Type] = 
       if (value.contains("@")) Right(unsafe(value))
-      else Left(BuildFailure(TypeInfo.of[Type], value, Some("Not an email address")))
+      else Left(BuildFailure("Not an email address"))
   }
 }

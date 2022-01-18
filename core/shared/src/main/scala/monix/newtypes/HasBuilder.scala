@@ -28,7 +28,7 @@ package monix.newtypes
 trait HasBuilder[Type] {
   type Source
 
-  def build(value: Source): Either[BuildFailure[Source], Type]
+  def build(value: Source): Either[BuildFailure[Type], Type]
 }
 
 object HasBuilder {
@@ -43,8 +43,23 @@ object HasBuilder {
   * For example, this can happen when decoding from JSON, this
   * result being used to signal an issue with the JSON document.
   */
-final case class BuildFailure[Source](
-  typeInfo: TypeInfo[_],
-  value: Source,
+final case class BuildFailure[T](
+  typeInfo: TypeInfo[T],
   message: Option[String],
-)
+) {
+  def toReadableString: String = {
+    val msg = message.fold("")(m => s" — $m")
+    s"Invalid ${typeInfo.asHumanReadable}$msg"
+  }
+
+  def toException: IllegalArgumentException =
+    new IllegalArgumentException(toReadableString)
+}
+
+object BuildFailure {
+  def apply[T: TypeInfo](): BuildFailure[T] =
+    new BuildFailure(TypeInfo.of[T], None)
+
+  def apply[T: TypeInfo](message: String): BuildFailure[T] =
+    new BuildFailure(TypeInfo.of[T], Some(message))
+}

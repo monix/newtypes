@@ -25,11 +25,11 @@ package monix.newtypes
   *   type EmailAddress = EmailAddress.Type
   *
   *   object EmailAddress extends NewtypeValidated[String] {
-  *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
+  *     def apply(v: String): Either[BuildFailure[Type], Type] =
   *       if (v.contains("@"))
   *         Right(unsafeCoerce(v))
   *       else
-  *         Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
+  *         Left(BuildFailure("missing @"))
   *   }
   * }}}
   */
@@ -43,11 +43,11 @@ abstract class NewtypeValidated[Src] extends Newtype[Src] with NewValidated[Src]
   *   type EmailAddress = EmailAddress.Type
   *
   *   object EmailAddress extends NewsubtypeValidated[String] {
-  *     def apply(v: String): Either[BuildFailure[String], EmailAddress] =
+  *     def apply(v: String): Either[BuildFailure[Type], Type] =
   *       if (v.contains("@"))
   *         Right(unsafeCoerce(v))
   *       else
-  *         Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
+  *         Left(BuildFailure[EmailAddress]("missing @"))
   *   }
   * }}}
   */
@@ -57,7 +57,7 @@ abstract class NewsubtypeValidated[Src] extends Newsubtype[Src] with NewValidate
   * Common implementation between [[NewtypeValidated]] and [[NewsubtypeValidated]].
   */
 private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
-  def apply(value: Src): Either[BuildFailure[Src], Type]
+  def apply(value: Src): Either[BuildFailure[Type], Type]
 
   final def unsafe(value: Src): Type =
     unsafeCoerce(value)
@@ -68,7 +68,7 @@ private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
   implicit final val builder: HasBuilder.Aux[Type, Src] =
     new HasBuilder[Type] {
       type Source = Src
-      def build(value: Src): Either[BuildFailure[Src], Type] = apply(value)
+      def build(value: Src): Either[BuildFailure[Type], Type] = apply(value)
     }
 }
 

@@ -31,9 +31,8 @@ class NewtypeValidatedSuite extends AnyFunSuite {
       case other =>
         fail(s"Unexpected match: $other")
     }
-
     EmailAddress("not a valid email") match {
-      case Left(BuildFailure(_, _, _)) => succeed
+      case Left(BuildFailure(_, _)) => succeed
       case other => fail(s"Unexpected value: $other")
     }
   }
@@ -72,10 +71,10 @@ object NewtypeValidatedSuite {
   type EmailAddress = EmailAddress.Type
 
   object EmailAddress extends NewtypeValidated[String] {
-    def apply(v: String): Either[BuildFailure[String], EmailAddress] =
+    def apply(v: String): Either[BuildFailure[Type], Type] =
       if (v.contains("@"))
         Right(unsafeCoerce(v))
       else
-        Left(BuildFailure(TypeInfo.of[EmailAddress], v, None))
+        Left(BuildFailure("missing @"))
   }
 }

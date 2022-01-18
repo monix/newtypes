@@ -3,13 +3,6 @@ import sbt.{Def, settingKey}
 
 object BuildKeys {
   /**
-    * When this value is set, it means we want to test and publish a custom Scala.js
-    * version, therefore we shouldn't re-publish the JVM packages.
-    */
-  lazy val customScalaJSVersion =
-    Option(System.getenv("SCALAJS_VERSION")).filter(_.nonEmpty)
-
-  /**
     * Human readable project title.
     *
     * Examples:

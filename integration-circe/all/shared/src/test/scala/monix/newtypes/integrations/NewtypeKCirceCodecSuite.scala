@@ -86,12 +86,12 @@ object NewtypeKCirceCodecSuite {
       new HasBuilder[Type[A]] {
         type Source = List[A]
 
-        override def build(value: List[A]): Either[BuildFailure[List[A]],Type[A]] =
+        override def build(value: List[A]): Either[BuildFailure[Type[A]], Type[A]] =
           value match {
             case head :: next => 
               Right(apply(head, next))
             case Nil => 
-              Left(BuildFailure(typeName[A], value, Some("Empty list")))
+              Left(BuildFailure("Empty list"))
           }
       }
   }
@@ -109,12 +109,12 @@ object NewtypeKCirceCodecSuite {
       new HasBuilder[Type[A]] {
         type Source = List[A]
 
-        override def build(value: List[A]): Either[BuildFailure[List[A]],Type[A]] =
+        override def build(value: List[A]): Either[BuildFailure[Type[A]], Type[A]] =
           value match {
             case head :: next => 
               Right(apply(head, next))
             case Nil => 
-              Left(BuildFailure(typeName[A], value, Some("Empty list")))
+              Left(BuildFailure("Empty list"))
           }
       }
   }

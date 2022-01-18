@@ -8,7 +8,7 @@ title:  Defining Newtypes
 Importing the dependency:
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "<version>"
+libraryDependencies += "io.monix" %% "newtypes-core" % "@VERSION@"
 ```
 
 **Table of contents:**
@@ -123,11 +123,11 @@ import monix.newtypes._
 type EmailAddress = EmailAddress.Type
 
 object EmailAddress extends NewtypeValidated[String] {
-  def apply(v: String): Either[BuildFailure[String], EmailAddress] =
+  def apply(v: String): Either[BuildFailure[Type], Type] =
     if (v.contains("@")) 
       Right(unsafeCoerce(v))
     else 
-      Left(BuildFailure(TypeInfo.of[EmailAddress], v, Some("missing @")))
+      Left(BuildFailure("missing @"))
 }
 ```
 
