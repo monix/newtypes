@@ -20,13 +20,13 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala212 = "2.12.14"
-val Scala213 = "2.13.6"
+val Scala212 = "2.12.15"
+val Scala213 = "2.13.8"
 val Scala3   = "3.1.0"
 
-val CatsVersion        = "2.6.1"
+val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
-val ScalaTestVersion   = "3.2.9"
+val ScalaTestVersion   = "3.2.10"
 val Shapeless2xVersion = "2.3.3"
 val Shapeless3xVersion = "3.0.2"
 
