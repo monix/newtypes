@@ -3,6 +3,7 @@ import Boilerplate._
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
+import sbtcrossproject.Platform
 
 // ---------------------------------------------------------------------------
 // Commands
@@ -149,7 +150,11 @@ lazy val sharedSettings = Seq(
 /**
   * Shared configuration across all sub-projects with actual code to be published.
   */
-def defaultCrossProjectConfiguration(pr: CrossProject) = {
+def defaultCrossProjectConfiguration(
+  platforms: Platform*
+)(
+  pr: CrossProject,
+) = {
   val sharedJavascriptSettings = Seq(
     coverageExcludedFiles := ".*",
     // Use globally accessible (rather than local) source paths in JS source maps
@@ -171,14 +176,22 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
       }
     },
   )
-
-  pr.configure(defaultPlugins)
+  val cross = pr
+    .configure(defaultPlugins)
     .settings(sharedSettings)
-    .jsSettings(sharedJavascriptSettings)
     .settings(crossVersionSharedSources)
     .settings(filterOutMultipleDependenciesFromGeneratedPomXml(
       "groupId" -> "org.scoverage".r :: Nil,
     ))
+
+  platforms.foldLeft(cross) { (acc, p) =>
+    p match {
+      case JSPlatform =>  
+        acc.jsSettings(sharedJavascriptSettings)
+      case _ =>
+        acc
+    }
+  }
 }
 
 lazy val root = project.in(file("."))
@@ -190,7 +203,6 @@ lazy val root = project.in(file("."))
     integrationCirceV014JVM,
     integrationCirceV014JS,
     integrationPureConfigV017JVM,
-    integrationPureConfigV017JS,
   )
   .configure(defaultPlugins)
   .settings(sharedSettings)
@@ -295,7 +307,7 @@ lazy val site = project.in(file("site"))
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
-  .configureCross(defaultCrossProjectConfiguration)
+  .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
   .jsConfigure(_.disablePlugins(MimaPlugin))
   .settings(
     name := "newtypes-core",
@@ -324,12 +336,9 @@ lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 
 // ---
-def circeSharedSettings(ver: String) = 
-  Seq(
+def integrationSharedSettings(other: Setting[_]*) =
+  other ++ Seq(
     libraryDependencies ++= Seq(
-      // https://circe.github.io/circe/
-      "io.circe" %%% "circe-core" % ver,
-      "io.circe" %%% "circe-parser" % ver % Test,
       "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
     ),  
   ) ++ Seq(Compile, Test).map { sc =>
@@ -345,11 +354,20 @@ def circeSharedSettings(ver: String) =
     }
   }
 
+def circeSharedSettings(ver: String) = 
+  integrationSharedSettings(
+    libraryDependencies ++= Seq(
+      // https://circe.github.io/circe/
+      "io.circe" %%% "circe-core" % ver,
+      "io.circe" %%% "circe-parser" % ver % Test,
+    )
+  )
+
 lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("integration-circe/v0.14"))
   .jsConfigure(_.disablePlugins(MimaPlugin))
-  .configureCross(defaultCrossProjectConfiguration)
+  .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
   .dependsOn(core)
   .settings(circeSharedSettings(CirceVersionV0_14))
   .settings(
@@ -361,34 +379,21 @@ lazy val integrationCirceV014JS  = integrationCirceV014.js
 
 // -----
 def pureConfigSharedSettings(ver: String) = 
-  Seq(
+  integrationSharedSettings(
     libraryDependencies ++= Seq(
-      "com.github.pureconfig" %% "pureconfig" % ver,
-      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+      "com.github.pureconfig" %%% "pureconfig" % ver,
     ),  
-  ) ++ Seq(Compile, Test).map { sc =>
-    (sc / unmanagedSourceDirectories) ++= {
-      val base = baseDirectory.value
-      val jvmOrJs = base.getName
-      val mainOrTest = sc match { case Compile => "main"; case Test => "test" }
-      val rootDir = baseDirectory.value.getParentFile().getParentFile
-      Seq(
-        rootDir / "all" / "shared" / "src" / mainOrTest / "scala",
-        rootDir / "all" / jvmOrJs / "src" / mainOrTest / "scala",
-      )
-    }
-  }
+  )
 
-lazy val integrationPureConfigV017 = crossProject(JSPlatform, JVMPlatform)
+lazy val integrationPureConfigV017 = crossProject(JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("integration-pureconfig/v0.17"))
-  .jsConfigure(_.disablePlugins(MimaPlugin))
-  .configureCross(defaultCrossProjectConfiguration)
+  .configureCross(defaultCrossProjectConfiguration(JVMPlatform))
   .dependsOn(core)
   .settings(pureConfigSharedSettings(PureConfigV0_17))
   .settings(
-    name := "newtypes-pureconfig-v0.17",
+    name := "newtypes-pureconfig-v0-17",
   )
 
+// Does not support Javascript, only JVM
 lazy val integrationPureConfigV017JVM = integrationPureConfigV017.jvm
-lazy val integrationPureConfigV017JS  = integrationPureConfigV017.js
