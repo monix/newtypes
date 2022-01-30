@@ -353,7 +353,7 @@ lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
   .dependsOn(core)
   .settings(circeSharedSettings(CirceVersionV0_14))
   .settings(
-    name := "newtypes-circe-v0.14",
+    name := "newtypes-circe-v0-14",
   )
 
 lazy val integrationCirceV014JVM = integrationCirceV014.jvm
