@@ -23,7 +23,7 @@ val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
 val ScalaTestVersion   = "3.2.10"
 val Shapeless2xVersion = "2.3.3"
-val Shapeless3xVersion = "3.0.2"
+val Shapeless3xVersion = "3.0.4"
 
 // ---------------------------------------------------------------------------
 
