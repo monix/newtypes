@@ -410,7 +410,7 @@ lazy val integrationCirceV014JS  = integrationCirceV014.js
 def pureConfigSharedSettings(ver: String) = 
   integrationSharedSettings(
     libraryDependencies ++= Seq(
-      "com.github.pureconfig" %%% "pureconfig" % ver,
+      "com.github.pureconfig" %%% "pureconfig-core" % ver,
     ),  
   )
 

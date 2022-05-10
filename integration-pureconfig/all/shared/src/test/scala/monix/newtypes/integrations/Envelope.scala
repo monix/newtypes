@@ -18,15 +18,25 @@
 package monix.newtypes.integrations
 
 import pureconfig._
-import pureconfig.generic.semiauto._
 import scala.annotation.nowarn
+import com.typesafe.config.ConfigFactory
 
-case class Envelope[A](value: A)
+final case class Envelope[A](value: A)
 
 @nowarn
 object Envelope {
   implicit def reader[A: ConfigReader]: ConfigReader[Envelope[A]] = 
-    deriveReader
+    ConfigReader.fromCursor[Envelope[A]] { cur =>
+      for {
+        objCur <- cur.asObjectCursor
+        valueCur <- objCur.atKey("value")
+        value <- ConfigReader[A].from(valueCur)
+      } yield Envelope(value)
+    } 
+    
   implicit def writer[A: ConfigWriter]: ConfigWriter[Envelope[A]] =
-    deriveWriter
+    (value: Envelope[A]) => 
+      ConfigFactory.empty()
+        .withValue("value", ConfigWriter[A].to(value.value))
+        .root()
 }
