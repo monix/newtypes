@@ -40,7 +40,7 @@ private trait NewEncodingK[Src[_]] {
   protected inline final def deriveK[F[_[_]]](using ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  given typeName[A: TypeInfo]: TypeInfo[Type[A]] = {
+  implicit def typeName[A: TypeInfo]: TypeInfo[Type[A]] = {
     val raw = TypeInfo.forClasses(ClassTag(getClass()))
     TypeInfo(
       typeName = raw.typeName.replaceFirst("[$]$", ""),
@@ -50,7 +50,7 @@ private trait NewEncodingK[Src[_]] {
     )
   }
 
-  final given extractor[A]: HasExtractor.Aux[Type[A], Src[A]] =
+  implicit final def extractor[A]: HasExtractor.Aux[Type[A], Src[A]] =
     new HasExtractor[Type[A]] {
       type Source = Src[A]
       def extract(value: Type[A]) = value.value

@@ -8,7 +8,7 @@ import sbtcrossproject.Platform
 // ---------------------------------------------------------------------------
 // Commands
 
-addCommandAlias("ci-test",    ";clean;Test/compile;test;package")
+addCommandAlias("ci-test",    ";clean;Test/compile;test;mimaReportBinaryIssues;package")
 addCommandAlias("ci-doc",     ";unidoc ;site/mdoc")
 addCommandAlias("ci",         ";project root ;reload ;+ci-test ;ci-doc")
 addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
@@ -43,8 +43,16 @@ def defaultPlugins: Project ⇒ Project = pr => {
   withCoverage
     .enablePlugins(AutomateHeaderPlugin)
     .enablePlugins(GitBranchPrompt)
-    .disablePlugins(MimaPlugin)
 }
+
+// The version with which we must keep binary compatibility.
+// https://github.com/typesafehub/migration-manager/wiki/Sbt-plugin
+val majorProjectSeries = "0.2.1"
+
+def mimaSettings(projectName: String) = Seq(
+  mimaPreviousArtifacts := Set("io.monix" %% projectName % majorProjectSeries),
+  //mimaBinaryIssueFilters ++= MimaFilters.changesFor_3_0_1,
+)
 
 lazy val sharedSettings = Seq(
   projectTitle := "Newtypes",
@@ -95,6 +103,9 @@ lazy val sharedSettings = Seq(
 
   Test / logBuffered := false,
   IntegrationTest / logBuffered := false,
+    
+  // https://github.com/lightbend/mima/pull/289
+  ThisBuild / mimaFailOnNoPrevious := false,
 
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
@@ -322,6 +333,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .in(file("core"))
   .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
   .jsConfigure(_.disablePlugins(MimaPlugin))
+  .jvmConfigure(_.settings(mimaSettings("newtypes-core")))
   .settings(
     name := "newtypes-core",
     libraryDependencies ++= Seq(
@@ -383,9 +395,8 @@ lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
   .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
   .dependsOn(core)
   .settings(circeSharedSettings(CirceVersionV0_14))
-  .settings(
-    name := "newtypes-circe-v0-14",
-  )
+  .settings(name := "newtypes-circe-v0-14")
+  .jvmSettings(mimaSettings("newtypes-circe-v0-14"))
 
 lazy val integrationCirceV014JVM = integrationCirceV014.jvm
 lazy val integrationCirceV014JS  = integrationCirceV014.js
