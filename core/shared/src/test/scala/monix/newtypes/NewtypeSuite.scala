@@ -53,6 +53,6 @@ object NewtypeSuite {
   type MyName = MyName.Type
   object MyName extends Newtype[String] {
     def apply(value: String) = unsafeCoerce(value)
-    implicit val eq: Eq[MyName] = derive
+    implicit val eq: Eq[MyName] = derive[Eq]
   }
 }
