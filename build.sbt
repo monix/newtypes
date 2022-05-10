@@ -101,9 +101,6 @@ lazy val sharedSettings = Seq(
   Test / logBuffered := false,
   IntegrationTest / logBuffered := false,
     
-  // https://github.com/lightbend/mima/pull/289
-  ThisBuild / mimaFailOnNoPrevious := false,
-
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
 
@@ -193,6 +190,10 @@ def defaultCrossProjectConfiguration(
       }
     },
   )
+  val sharedJVMSettings = Seq(
+    // https://github.com/lightbend/mima/pull/289
+    ThisBuild / mimaFailOnNoPrevious := false,
+  )
   val cross = pr
     .configure(defaultPlugins)
     .settings(sharedSettings)
@@ -206,7 +207,7 @@ def defaultCrossProjectConfiguration(
       case JSPlatform =>  
         acc.jsSettings(sharedJavascriptSettings)
       case _ =>
-        acc
+        acc.jvmSettings(sharedJVMSettings)
     }
   }
 }
