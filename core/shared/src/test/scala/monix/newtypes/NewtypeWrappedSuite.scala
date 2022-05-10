@@ -79,6 +79,6 @@ object NewtypeWrappedSuite {
 
   type MyName = MyName.Type
   object MyName extends NewtypeWrapped[String] {
-    implicit val eq: Eq[MyName] = derive[Eq]
+    implicit val eq: Eq[MyName] = derive
   }
 }
