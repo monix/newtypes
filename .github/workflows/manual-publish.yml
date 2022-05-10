@@ -1,0 +1,47 @@
+name: manual-publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref_to_publish:
+        description: 'Ref (branch or tag)'
+        required: true
+        default: 'refs/heads/main'
+      stable_version:
+        description: 'Stable version? (true=staging, false=snapshot)'
+        required: true
+        default: "true"
+
+jobs:
+  publish:
+    name: Publish to Sonatype (Request)
+
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
+          ref: ${{ github.event.inputs.ref_to_publish }}
+
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.8"
+
+      - name: Install GnuPG2
+        run: |
+          ./.github/scripts/setup-pgp
+
+      - name: sbt ci-release
+        run: |
+          git fetch --depth=100 origin +refs/tags/*:refs/tags/*
+          if [ "$PUBLISH_STABLE_VERSION" = "true" ]; then
+            sbt ci-release
+          else
+            sbt +clean +publishSigned
+          fi
+        env:
+          PGP_KEY_HEX: ${{ secrets.PGP_KEY_HEX }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          PUBLISH_STABLE_VERSION: ${{ github.event.inputs.stable_version }}
