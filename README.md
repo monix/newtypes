@@ -22,7 +22,7 @@ libraryDependencies += "io.monix" %% "newtypes-circe-v0-14" % "0.2.2"
 For the [PureConfig integration](https://newtypes.monix.io/docs/pure-config.html):
 
 ```scala
-// For Circe version 0.14.x
+// For PureConfig version 0.17.x
 libraryDependencies += "io.monix" %% "newtypes-pureconfig-v0-17" % "0.2.2"
 ```
 
