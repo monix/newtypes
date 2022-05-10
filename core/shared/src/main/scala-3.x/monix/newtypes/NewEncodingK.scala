@@ -46,7 +46,7 @@ private trait NewEncodingK[Src[_]] {
       typeName = raw.typeName.replaceFirst("[$]$", ""),
       typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
       packageName = raw.packageName,
-      typeParams = List(Some(summon[TypeInfo[A]]))
+      typeParams = List(Some(implicitly[TypeInfo[A]]))
     )
   }
 
