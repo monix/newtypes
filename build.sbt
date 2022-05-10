@@ -3,6 +3,7 @@ import Boilerplate._
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
+import sbtcrossproject.Platform
 
 // ---------------------------------------------------------------------------
 // Commands
@@ -10,22 +11,27 @@ import sbtcrossproject.CrossProject
 addCommandAlias("ci-test",    ";clean;Test/compile;test;package")
 addCommandAlias("ci-doc",     ";unidoc ;site/mdoc")
 addCommandAlias("ci",         ";project root ;reload ;+ci-test ;ci-doc")
-addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosite")
+addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala212 = "2.12.15"
-val Scala213 = "2.13.8"
-val Scala3   = "3.1.0"
+val Scala212  = "2.12.15"
+val Scala213  = "2.13.8"
+val Scala3    = "3.1.2"
+val Scala3Out = "3.0"
 
 val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
+val PureConfigV0_17    = "0.17.1"
 val ScalaTestVersion   = "3.2.10"
-val Shapeless2xVersion = "2.3.3"
+val Shapeless2xVersion = "2.3.9"
 val Shapeless3xVersion = "3.0.4"
 
 // ---------------------------------------------------------------------------
+
+lazy val publishStableVersion =
+  settingKey[Boolean]("If it should publish stable versions to Sonatype staging repository, instead of a snapshot")
 
 /**
   * Defines common plugins between all projects.
@@ -55,16 +61,28 @@ lazy val sharedSettings = Seq(
   // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
   versionScheme := Some("early-semver"),
 
+  // Scala settings for generated output
+  scalacOptions ++= {
+    val common = Seq("-release", "8")
+    val scVer = scalaVersion.value
+    common ++ (
+      CrossVersion.partialVersion(scVer) match {
+        case Some((3, _)) => Seq("-scala-output-version", Scala3Out)
+        case _ => Seq.empty
+      })
+  },
+
   // Turning off fatal warnings for doc generation
-  Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
+  Compile / doc / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
   // Turning off fatal warnings and certain annoyances during testing
-  Test / scalacOptions ~= (_ filterNot (Set(
-    "-Xfatal-warnings",
-    "-Werror",
-    "-Ywarn-value-discard",
-    "-Wvalue-discard",
-  ))),
+  Test / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
+  // Seq(
+  //   "-Xfatal-warnings",
+  //   "-Werror",
+  //   "-Ywarn-value-discard",
+  //   "-Wvalue-discard",
+  // ),
 
   // ScalaDoc settings
   autoAPIMappings := true,
@@ -95,6 +113,14 @@ lazy val sharedSettings = Seq(
 
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
+
+  ThisBuild / publishTo := sonatypePublishToBundle.value,
+  ThisBuild / isSnapshot := {
+    !isVersionStable.value || !publishStableVersion.value
+  },
+  ThisBuild / dynverSonatypeSnapshots := !(isVersionStable.value && publishStableVersion.value),
+  ThisBuild / sonatypeProfileName := organization.value,
+  sonatypeSessionName := s"[sbt-sonatype] ${name.value}-${version.value}",
 
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false }, // removes optional dependencies
@@ -148,7 +174,11 @@ lazy val sharedSettings = Seq(
 /**
   * Shared configuration across all sub-projects with actual code to be published.
   */
-def defaultCrossProjectConfiguration(pr: CrossProject) = {
+def defaultCrossProjectConfiguration(
+  platforms: Platform*
+)(
+  pr: CrossProject,
+) = {
   val sharedJavascriptSettings = Seq(
     coverageExcludedFiles := ".*",
     // Use globally accessible (rather than local) source paths in JS source maps
@@ -170,14 +200,22 @@ def defaultCrossProjectConfiguration(pr: CrossProject) = {
       }
     },
   )
-
-  pr.configure(defaultPlugins)
+  val cross = pr
+    .configure(defaultPlugins)
     .settings(sharedSettings)
-    .jsSettings(sharedJavascriptSettings)
     .settings(crossVersionSharedSources)
     .settings(filterOutMultipleDependenciesFromGeneratedPomXml(
       "groupId" -> "org.scoverage".r :: Nil,
     ))
+
+  platforms.foldLeft(cross) { (acc, p) =>
+    p match {
+      case JSPlatform =>  
+        acc.jsSettings(sharedJavascriptSettings)
+      case _ =>
+        acc
+    }
+  }
 }
 
 lazy val root = project.in(file("."))
@@ -188,6 +226,7 @@ lazy val root = project.in(file("."))
     coreJS, 
     integrationCirceV014JVM,
     integrationCirceV014JS,
+    integrationPureConfigV017JVM,
   )
   .configure(defaultPlugins)
   .settings(sharedSettings)
@@ -206,6 +245,11 @@ lazy val root = project.in(file("."))
     ),
     // Use Node.js in tests
     Global / scalaJSStage := FastOptStage,
+    // Used in CI when publishing artifacts to Sonatype
+    Global / publishStableVersion := {
+      sys.env.get("PUBLISH_STABLE_VERSION")
+        .exists(v => v == "true" || v == "1" || v == "yes")
+    },
   )
 
 lazy val site = project.in(file("site"))
@@ -216,6 +260,7 @@ lazy val site = project.in(file("site"))
   .settings(doNotPublishArtifact)
   .dependsOn(coreJVM)
   .dependsOn(integrationCirceV014JVM)
+  .dependsOn(integrationPureConfigV017JVM)
   .settings {
     import microsites._
     Seq(
@@ -245,6 +290,7 @@ lazy val site = project.in(file("site"))
       libraryDependencies ++= Seq(
         "com.47deg" %% "github4s" % "0.29.1",
         "io.circe" %%% "circe-parser" % CirceVersionV0_14,
+        "com.github.pureconfig" %%% "pureconfig" % PureConfigV0_17,
       ),
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
@@ -257,7 +303,6 @@ lazy val site = project.in(file("site"))
       ),
       micrositeExtraMdFiles := Map(
         file("README.md") -> ExtraMdFileConfig("index.md", "page", Map("title" -> "Home", "section" -> "home", "position" -> "100")),
-        file("CHANGELOG.md") -> ExtraMdFileConfig("CHANGELOG.md", "page", Map("title" -> "Change Log", "section" -> "changelog", "position" -> "110")),
         file("CONTRIBUTING.md") -> ExtraMdFileConfig("CONTRIBUTING.md", "page", Map("title" -> "Contributing", "section" -> "contributing", "position" -> "120")),
         file("CODE_OF_CONDUCT.md") -> ExtraMdFileConfig("CODE_OF_CONDUCT.md", "page", Map("title" -> "Code of Conduct", "section" -> "code of conduct", "position" -> "130")),
         file("LICENSE.md") -> ExtraMdFileConfig("LICENSE.md", "page", Map("title" -> "License", "section" -> "license", "position" -> "140")),
@@ -267,7 +312,7 @@ lazy val site = project.in(file("site"))
       Compile / sourceDirectory := baseDirectory.value / "src",
       Test / sourceDirectory := baseDirectory.value / "test",
       mdocIn := (Compile / sourceDirectory).value / "mdoc",
-      scalacOptions ~= filterConsoleScalacOptions,
+      tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
       mdocVariables := Map(
         "VERSION" -> version.value,
@@ -290,7 +335,7 @@ lazy val site = project.in(file("site"))
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
-  .configureCross(defaultCrossProjectConfiguration)
+  .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
   .jsConfigure(_.disablePlugins(MimaPlugin))
   .settings(
     name := "newtypes-core",
@@ -319,12 +364,9 @@ lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 
 // ---
-def circeSharedSettings(ver: String) = 
-  Seq(
+def integrationSharedSettings(other: Setting[_]*) =
+  other ++ Seq(
     libraryDependencies ++= Seq(
-      // https://circe.github.io/circe/
-      "io.circe" %%% "circe-core" % ver,
-      "io.circe" %%% "circe-parser" % ver % Test,
       "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
     ),  
   ) ++ Seq(Compile, Test).map { sc =>
@@ -340,16 +382,46 @@ def circeSharedSettings(ver: String) =
     }
   }
 
+def circeSharedSettings(ver: String) = 
+  integrationSharedSettings(
+    libraryDependencies ++= Seq(
+      // https://circe.github.io/circe/
+      "io.circe" %%% "circe-core" % ver,
+      "io.circe" %%% "circe-parser" % ver % Test,
+    )
+  )
+
 lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("integration-circe/v0.14"))
   .jsConfigure(_.disablePlugins(MimaPlugin))
-  .configureCross(defaultCrossProjectConfiguration)
+  .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
   .dependsOn(core)
   .settings(circeSharedSettings(CirceVersionV0_14))
   .settings(
-    name := "newtypes-circe-v0.14",
+    name := "newtypes-circe-v0-14",
   )
 
 lazy val integrationCirceV014JVM = integrationCirceV014.jvm
 lazy val integrationCirceV014JS  = integrationCirceV014.js
+
+// -----
+def pureConfigSharedSettings(ver: String) = 
+  integrationSharedSettings(
+    libraryDependencies ++= Seq(
+      "com.github.pureconfig" %%% "pureconfig-core" % ver,
+    ),  
+  )
+
+lazy val integrationPureConfigV017 = crossProject(JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("integration-pureconfig/v0.17"))
+  .configureCross(defaultCrossProjectConfiguration(JVMPlatform))
+  .dependsOn(core)
+  .settings(pureConfigSharedSettings(PureConfigV0_17))
+  .settings(
+    name := "newtypes-pureconfig-v0-17",
+  )
+
+// Does not support Javascript, only JVM
+lazy val integrationPureConfigV017JVM = integrationPureConfigV017.jvm
