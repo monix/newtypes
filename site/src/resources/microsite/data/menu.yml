@@ -15,3 +15,7 @@ options:
       - title: Circe JSON Integration
         url: docs/circe.html
         menu_section: docs
+
+      - title: PureConfig Integration
+        url: docs/pure-config.html
+        menu_section: docs

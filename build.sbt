@@ -11,7 +11,7 @@ import sbtcrossproject.Platform
 addCommandAlias("ci-test",    ";clean;Test/compile;test;package")
 addCommandAlias("ci-doc",     ";unidoc ;site/mdoc")
 addCommandAlias("ci",         ";project root ;reload ;+ci-test ;ci-doc")
-addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosite")
+addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 
 // ---------------------------------------------------------------------------
 // Versions

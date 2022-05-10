@@ -17,6 +17,8 @@ Usage:
 ```scala mdoc:silent
 import monix.newtypes._
 import monix.newtypes.integrations.DerivedPureConfigConvert
+import pureconfig._
+import pureconfig.generic.semiauto._
 
 type EmailAddress = EmailAddress.Type
 object EmailAddress extends NewtypeValidated[String] with DerivedPureConfigConvert {
@@ -33,8 +35,6 @@ final case class Envelope[A](
 )
 
 object Envelope {
-  import pureconfig.generic.semiauto._
-
   implicit def reader[A: ConfigReader]: ConfigReader[Envelope[A]] = 
     deriveReader
   implicit def writer[A: ConfigWriter]: ConfigWriter[Envelope[A]] =
@@ -48,13 +48,13 @@ You can now serialize and deserialize to/from HOCON configuration:
 import pureconfig._
 import com.typesafe.config._
 
-val renderoptions =
-  configrenderoptions
+val renderOptions =
+  ConfigRenderOptions
     .defaults()
-    .setorigincomments(false)
-    .setcomments(false)
-    .setformatted(true)
-    .setjson(true)
+    .setOriginComments(false)
+    .setComments(false)
+    .setFormatted(true)
+    .setJson(true)
 
 val serialized = 
   ConfigWriter[Envelope[EmailAddress]]
@@ -62,6 +62,6 @@ val serialized =
     .render(renderOptions)
 
 ConfigSource
-  .string(str)
+  .string(serialized)
   .load[Envelope[EmailAddress]]
 ```
