@@ -78,6 +78,6 @@ object NewsubtypeWrappedSuite {
 
   type YourName = YourName.Type
   object YourName extends NewsubtypeWrapped[String] {
-    implicit val eq: Eq[YourName] = derive
+    implicit val eq: Eq[YourName] = derive[Eq]
   }
 }
