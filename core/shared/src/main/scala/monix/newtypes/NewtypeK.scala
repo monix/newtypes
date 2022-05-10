@@ -39,11 +39,12 @@ package monix.newtypes
   *       Some((l.head, l.tail)) 
   *     }
   *
-  *     implicit def eq[A: Eq]: Eq[Nel[A]] = derive
-  *
-  *     implicit val traverse: Traverse[Nel] = deriveK
-  *
-  *     implicit val monad: Monad[Nel] = deriveK 
+  *     implicit def eq[A: Eq]: Eq[Nel[A]] = 
+  *       derive[Eq, A]
+  *     implicit val traverse: Traverse[Nel] = 
+  *       deriveK[Traverse]
+  *     implicit val monad: Monad[Nel] = 
+  *       deriveK[Monad]
   *   } 
   * }}}
   *
@@ -74,11 +75,12 @@ abstract class NewtypeK[Src[_]] extends NewtypeTraitK[Src]
   *       Some((l.head, l.tail)) 
   *     }
   *
-  *     implicit def eq[A: Eq]: Eq[NonEmptyList[A]] = derive
-  *
-  *     implicit val traverse: Traverse[NonEmptyList] = deriveK
-  *
-  *     implicit val monad: Monad[NonEmptyList] = deriveK 
+  *     implicit def eq[A: Eq]: Eq[NonEmptyList[A]] = 
+  *       derive[Eq, A]
+  *     implicit val traverse: Traverse[NonEmptyList] = 
+  *       deriveK[Traverse]
+  *     implicit val monad: Monad[NonEmptyList] = 
+  *       deriveK[Monad]
   *   } 
   * }}}
   *
