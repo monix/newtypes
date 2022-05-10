@@ -68,9 +68,6 @@ lazy val sharedSettings = Seq(
   // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
   versionScheme := Some("early-semver"),
 
-  // Scala settings for generated output
-  scalacOptions ++= Seq("-release", "8"),
-
   // Turning off fatal warnings for doc generation
   Compile / doc / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
