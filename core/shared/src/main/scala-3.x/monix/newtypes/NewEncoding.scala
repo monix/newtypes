@@ -33,10 +33,10 @@ private trait NewEncoding[Src] {
   protected inline final def unsafeCoerce(value: Src): Type =
     value.asInstanceOf[Type]
 
-  protected inline final def derive[F[_]](implicit ev: F[Src]): F[Type] =
+  protected inline final def derive[F[_]](using ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  implicit val typeInfo: TypeInfo[Type] = {
+  given typeInfo: TypeInfo[Type] = {
     val raw = TypeInfo.forClasses(ClassTag(getClass))
     TypeInfo(
       typeName = raw.typeName.replaceFirst("[$]$", ""),
@@ -46,7 +46,7 @@ private trait NewEncoding[Src] {
     )
   }
 
-  implicit val codec: HasExtractor.Aux[Type, Src] =
+  given codec: HasExtractor.Aux[Type, Src] =
     new HasExtractor[Type] {
       type Source = Src
       def extract(value: Type) = NewEncoding.this.value(value)

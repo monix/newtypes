@@ -90,12 +90,10 @@ object NewsubtypeCovariantKSuite {
     }
 
     implicit def eq[A: Eq]: Eq[Nel[A]] =
-      derive[Eq, A]
-
+      derive
     implicit val traverse: Traverse[Nel] =
-      deriveK[Traverse]
-
+      deriveK
     implicit val monad: Monad[Nel] =
-      deriveK[Monad]
+      deriveK
   }
 }

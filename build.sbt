@@ -18,8 +18,7 @@ addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 
 val Scala212  = "2.12.15"
 val Scala213  = "2.13.8"
-val Scala3    = "3.1.2"
-val Scala3Out = "3.0"
+val Scala3    = "3.1.1"
 
 val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
@@ -62,27 +61,13 @@ lazy val sharedSettings = Seq(
   versionScheme := Some("early-semver"),
 
   // Scala settings for generated output
-  scalacOptions ++= {
-    val common = Seq("-release", "8")
-    val scVer = scalaVersion.value
-    common ++ (
-      CrossVersion.partialVersion(scVer) match {
-        case Some((3, _)) => Seq("-scala-output-version", Scala3Out)
-        case _ => Seq.empty
-      })
-  },
+  scalacOptions ++= Seq("-release", "8"),
 
   // Turning off fatal warnings for doc generation
   Compile / doc / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
   // Turning off fatal warnings and certain annoyances during testing
   Test / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
-  // Seq(
-  //   "-Xfatal-warnings",
-  //   "-Werror",
-  //   "-Ywarn-value-discard",
-  //   "-Wvalue-discard",
-  // ),
 
   // ScalaDoc settings
   autoAPIMappings := true,

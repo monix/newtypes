@@ -31,26 +31,26 @@ private trait NewEncodingK[Src[_]] {
     inline final def value: Src[A] = self.asInstanceOf[Src[A]]
   }
 
-  protected final def unsafeCoerce[A](value: Src[A]): Type[A] =
+  protected inline final def unsafeCoerce[A](value: Src[A]): Type[A] =
     value.asInstanceOf[Type[A]]
 
-  protected final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =
+  protected inline final def derive[F[_], A](using ev: F[Src[A]]): F[Type[A]] =
     ev.asInstanceOf[F[Type[A]]]
 
-  protected final def deriveK[F[_[_]]](using ev: F[Src]): F[Type] =
+  protected inline final def deriveK[F[_[_]]](using ev: F[Src]): F[Type] =
     ev.asInstanceOf[F[Type]]
 
-  implicit def typeName[A: TypeInfo]: TypeInfo[Type[A]] = {
+  given typeName[A: TypeInfo]: TypeInfo[Type[A]] = {
     val raw = TypeInfo.forClasses(ClassTag(getClass()))
     TypeInfo(
       typeName = raw.typeName.replaceFirst("[$]$", ""),
       typeLabel = raw.typeLabel.replaceFirst("[$](\\d+[$])?$", ""),
       packageName = raw.packageName,
-      typeParams = List(Some(implicitly[TypeInfo[A]]))
+      typeParams = List(Some(summon[TypeInfo[A]]))
     )
   }
 
-  implicit final def extractor[A]: HasExtractor.Aux[Type[A], Src[A]] =
+  final given extractor[A]: HasExtractor.Aux[Type[A], Src[A]] =
     new HasExtractor[Type[A]] {
       type Source = Src[A]
       def extract(value: Type[A]) = value.value
