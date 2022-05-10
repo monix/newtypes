@@ -19,6 +19,13 @@ For the [Circe integration](https://newtypes.monix.io/docs/circe.html):
 libraryDependencies += "io.monix" %% "newtypes-circe-v0-14" % "0.2.2"
 ```
 
+For the [PureConfig integration](https://newtypes.monix.io/docs/pure-config.html):
+
+```scala
+// For Circe version 0.14.x
+libraryDependencies += "io.monix" %% "newtypes-pureconfig-v0-17" % "0.2.2"
+```
+
 NOTE: the [version scheme](https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html) is set to `early-semver`.
 
 ### Documentation
