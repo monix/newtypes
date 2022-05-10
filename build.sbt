@@ -15,9 +15,10 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala212 = "2.12.15"
-val Scala213 = "2.13.8"
-val Scala3   = "3.1.0"
+val Scala212  = "2.12.15"
+val Scala213  = "2.13.8"
+val Scala3    = "3.1.2"
+val Scala3Out = "3.0"
 
 val CatsVersion        = "2.7.0"
 val CirceVersionV0_14  = "0.14.1"
@@ -26,6 +27,9 @@ val Shapeless2xVersion = "2.3.3"
 val Shapeless3xVersion = "3.0.2"
 
 // ---------------------------------------------------------------------------
+
+lazy val publishStableVersion =
+  settingKey[Boolean]("If it should publish stable versions to Sonatype staging repository, instead of a snapshot")
 
 /**
   * Defines common plugins between all projects.
@@ -55,16 +59,28 @@ lazy val sharedSettings = Seq(
   // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
   versionScheme := Some("early-semver"),
 
+  // Scala settings for generated output
+  scalacOptions ++= {
+    val common = Seq("-release", "8")
+    val scVer = scalaVersion.value
+    common ++ (
+      CrossVersion.partialVersion(scVer) match {
+        case Some((3, _)) => Seq("-scala-output-version", Scala3Out)
+        case _ => Seq.empty
+      })
+  },
+
   // Turning off fatal warnings for doc generation
-  Compile / doc / scalacOptions ~= filterConsoleScalacOptions,
+  Compile / doc / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
   // Turning off fatal warnings and certain annoyances during testing
-  Test / scalacOptions ~= (_ filterNot (Set(
-    "-Xfatal-warnings",
-    "-Werror",
-    "-Ywarn-value-discard",
-    "-Wvalue-discard",
-  ))),
+  Test / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
+  // Seq(
+  //   "-Xfatal-warnings",
+  //   "-Werror",
+  //   "-Ywarn-value-discard",
+  //   "-Wvalue-discard",
+  // ),
 
   // ScalaDoc settings
   autoAPIMappings := true,
@@ -95,6 +111,14 @@ lazy val sharedSettings = Seq(
 
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
+
+  ThisBuild / publishTo := sonatypePublishToBundle.value,
+  ThisBuild / isSnapshot := {
+    !isVersionStable.value || !publishStableVersion.value
+  },
+  ThisBuild / dynverSonatypeSnapshots := !(isVersionStable.value && publishStableVersion.value),
+  ThisBuild / sonatypeProfileName := organization.value,
+  sonatypeSessionName := s"[sbt-sonatype] ${name.value}-${version.value}",
 
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false }, // removes optional dependencies
@@ -206,6 +230,11 @@ lazy val root = project.in(file("."))
     ),
     // Use Node.js in tests
     Global / scalaJSStage := FastOptStage,
+    // Used in CI when publishing artifacts to Sonatype
+    Global / publishStableVersion := {
+      sys.env.get("PUBLISH_STABLE_VERSION")
+        .exists(v => v == "true" || v == "1" || v == "yes")
+    },
   )
 
 lazy val site = project.in(file("site"))
@@ -267,7 +296,7 @@ lazy val site = project.in(file("site"))
       Compile / sourceDirectory := baseDirectory.value / "src",
       Test / sourceDirectory := baseDirectory.value / "test",
       mdocIn := (Compile / sourceDirectory).value / "mdoc",
-      scalacOptions ~= filterConsoleScalacOptions,
+      tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
       mdocVariables := Map(
         "VERSION" -> version.value,
