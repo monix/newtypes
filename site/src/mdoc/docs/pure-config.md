@@ -9,7 +9,7 @@ Importing the [PureConfig](https://github.com/pureconfig/pureconfig) integration
 
 ```scala
 // For Circe version 0.14.x
-libraryDependencies += "io.monix" %% "newtypes-pureconfig-v0.17" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-pureconfig-v0-17" % "@VERSION@"
 ```
 
 Usage:
@@ -23,9 +23,9 @@ import pureconfig.generic.semiauto._
 type EmailAddress = EmailAddress.Type
 object EmailAddress extends NewtypeValidated[String] with DerivedPureConfigConvert {
   def apply(v: String): Either[BuildFailure[Type], Type] =
-    if (v.contains("@")) 
+    if (v.contains("@"))
       Right(unsafeCoerce(v))
-    else 
+    else
       Left(BuildFailure("missing @"))
 }
 
@@ -35,7 +35,7 @@ final case class Envelope[A](
 )
 
 object Envelope {
-  implicit def reader[A: ConfigReader]: ConfigReader[Envelope[A]] = 
+  implicit def reader[A: ConfigReader]: ConfigReader[Envelope[A]] =
     deriveReader
   implicit def writer[A: ConfigWriter]: ConfigWriter[Envelope[A]] =
     deriveWriter
@@ -56,7 +56,7 @@ val renderOptions =
     .setFormatted(true)
     .setJson(true)
 
-val serialized = 
+val serialized =
   ConfigWriter[Envelope[EmailAddress]]
     .to(Envelope(EmailAddress.unsafe("noreply@alexn.org")))
     .render(renderOptions)
