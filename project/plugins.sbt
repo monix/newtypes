@@ -5,7 +5,7 @@ addSbtPlugin("com.47deg"                 % "sbt-microsites"                % "1.
 addSbtPlugin("com.dwijnand"              % "sbt-dynver"                    % "4.1.1")
 addSbtPlugin("com.github.sbt"            % "sbt-unidoc"                    % "0.5.0")
 addSbtPlugin("com.github.sbt"            % "sbt-pgp"                       % "2.1.2")
-addSbtPlugin("com.typesafe"              % "sbt-mima-plugin"               % "1.1.0")
+addSbtPlugin("com.typesafe"              % "sbt-mima-plugin"               % "1.1.1")
 addSbtPlugin("de.heikoseeberger"         % "sbt-header"                    % "5.7.0")
 addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat"                  % "0.3.1")
 addSbtPlugin("org.portable-scala"        % "sbt-scalajs-crossproject"      % "1.2.0")
