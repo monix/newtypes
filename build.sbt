@@ -18,14 +18,14 @@ addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 
 val Scala212  = "2.12.15"
 val Scala213  = "2.13.8"
-val Scala3    = "3.1.1"
+val Scala3    = "3.1.3"
 
-val CatsVersion        = "2.7.0"
+val CatsVersion        = "2.8.0"
 val CirceVersionV0_14  = "0.14.2"
 val PureConfigV0_17    = "0.17.1"
 val ScalaTestVersion   = "3.2.10"
 val Shapeless2xVersion = "2.3.10"
-val Shapeless3xVersion = "3.0.4"
+val Shapeless3xVersion = "3.2.0"
 
 // ---------------------------------------------------------------------------
 
