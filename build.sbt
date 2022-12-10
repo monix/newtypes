@@ -20,12 +20,13 @@ val Scala212  = "2.12.15"
 val Scala213  = "2.13.8"
 val Scala3    = "3.1.3"
 
-val CatsVersion        = "2.8.0"
-val CirceVersionV0_14  = "0.14.3"
-val PureConfigV0_17    = "0.17.1"
-val ScalaTestVersion   = "3.2.14"
-val Shapeless2xVersion = "2.3.9"
-val Shapeless3xVersion = "3.2.0"
+val CatsVersion          = "2.9.0"
+val CirceVersionV0_14    = "0.14.3"
+val PureConfigV0_17      = "0.17.1"
+val ScalaTestVersion     = "3.2.14"
+val ScalaTestPlusVersion = "3.2.14.0"
+val Shapeless2xVersion   = "2.3.9"
+val Shapeless3xVersion   = "3.2.0"
 
 // ---------------------------------------------------------------------------
 
@@ -216,8 +217,10 @@ lazy val root = project.in(file("."))
   .enablePlugins(ScalaUnidocPlugin)
   .disablePlugins(MimaPlugin)
   .aggregate(
-    coreJVM, 
-    coreJS, 
+    coreJVM,
+    coreJS,
+    integrationCatsV2JVM,
+    integrationCatsV2JS,
     integrationCirceV014JVM,
     integrationCirceV014JS,
     integrationPureConfigV017JVM,
@@ -253,6 +256,7 @@ lazy val site = project.in(file("site"))
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
   .dependsOn(coreJVM)
+  .dependsOn(integrationCatsV2JVM)
   .dependsOn(integrationCirceV014JVM)
   .dependsOn(integrationPureConfigV017JVM)
   .settings {
@@ -377,6 +381,29 @@ def integrationSharedSettings(other: Setting[_]*) =
     }
   }
 
+// ---
+def catsSharedSettings(ver: String) =
+  integrationSharedSettings(
+    libraryDependencies ++= Seq(
+      "org.typelevel"     %%% "cats-core"       % ver,
+      "org.scalatestplus" %%% "scalacheck-1-17" % ScalaTestPlusVersion % Test,
+    )
+  )
+
+lazy val integrationCatsV2 = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("integration-cats/v2"))
+  .jsConfigure(_.disablePlugins(MimaPlugin))
+  .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
+  .dependsOn(core)
+  .settings(catsSharedSettings(CatsVersion))
+  .settings(name := "newtypes-cats-v2")
+  .jvmSettings(mimaSettings("newtypes-cats-v2"))
+
+lazy val integrationCatsV2JVM = integrationCatsV2.jvm
+lazy val integrationCatsV2JS  = integrationCatsV2.js
+
+// ---
 def circeSharedSettings(ver: String) = 
   integrationSharedSettings(
     libraryDependencies ++= Seq(
