@@ -1,7 +1,7 @@
 val ScalaJSVersion = Option(System.getenv("SCALAJS_VERSION")).filter(_.nonEmpty).getOrElse("1.10.0")
 
 addSbtPlugin("com.github.tkawachi"       % "sbt-doctest"                   % "0.10.0")
-addSbtPlugin("com.47deg"                 % "sbt-microsites"                % "1.3.4")
+addSbtPlugin("com.47deg"                 % "sbt-microsites"                % "1.4.1")
 addSbtPlugin("com.dwijnand"              % "sbt-dynver"                    % "4.1.1")
 addSbtPlugin("com.github.sbt"            % "sbt-unidoc"                    % "0.5.0")
 addSbtPlugin("com.github.sbt"            % "sbt-pgp"                       % "2.2.0")
