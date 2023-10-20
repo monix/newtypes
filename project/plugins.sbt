@@ -8,7 +8,7 @@ addSbtPlugin("com.github.sbt"            % "sbt-pgp"                       % "2.
 addSbtPlugin("com.typesafe"              % "sbt-mima-plugin"               % "1.1.1")
 addSbtPlugin("de.heikoseeberger"         % "sbt-header"                    % "5.8.0")
 addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat"                  % "0.3.1")
-addSbtPlugin("org.portable-scala"        % "sbt-scalajs-crossproject"      % "1.2.0")
+addSbtPlugin("org.portable-scala"        % "sbt-scalajs-crossproject"      % "1.3.2")
 addSbtPlugin("org.scala-js"              % "sbt-scalajs"                   % ScalaJSVersion)
 addSbtPlugin("org.scalameta"             % "sbt-mdoc"                      % "2.3.8")
 addSbtPlugin("org.scoverage"             % "sbt-scoverage"                 % "1.9.3")
