@@ -10,6 +10,6 @@ addSbtPlugin("de.heikoseeberger"         % "sbt-header"                    % "5.
 addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat"                  % "0.3.1")
 addSbtPlugin("org.portable-scala"        % "sbt-scalajs-crossproject"      % "1.2.0")
 addSbtPlugin("org.scala-js"              % "sbt-scalajs"                   % ScalaJSVersion)
-addSbtPlugin("org.scalameta"             % "sbt-mdoc"                      % "2.3.8")
+addSbtPlugin("org.scalameta"             % "sbt-mdoc"                      % "2.5.1")
 addSbtPlugin("org.scoverage"             % "sbt-scoverage"                 % "1.9.3")
 addSbtPlugin("org.xerial.sbt"            % "sbt-sonatype"                  % "3.9.21")
