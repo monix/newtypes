@@ -17,7 +17,7 @@ addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 // Versions
 
 val Scala212  = "2.12.15"
-val Scala213  = "2.13.8"
+val Scala213  = "2.13.13"
 val Scala3    = "3.1.3"
 
 val CatsVersion        = "2.10.0"
