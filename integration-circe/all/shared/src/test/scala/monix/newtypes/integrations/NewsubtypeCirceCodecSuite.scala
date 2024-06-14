@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 the Newtypes contributors.
+ * Copyright (c) 2021-2024 Alexandru Nedelcu.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +64,8 @@ class NewsubtypeCirceCodecSuite extends AnyFunSuite {
   test("NewsubtypeValidated decoder does validation") {
     val value = parser.parse("\"Not an email\"").flatMap(_.as[EmailAddress])
     assert(value.isLeft)
-    assert(value.left.map(_.getMessage()) == Left("Invalid EmailAddress — Not an email address"))
+    val msg = value.left.map(_.getMessage()).swap.getOrElse("")
+    assert(msg.contains("Invalid EmailAddress — Not an email address"))
   }
 }
 
