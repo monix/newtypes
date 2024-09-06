@@ -17,14 +17,14 @@ addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala212  = "2.12.19"
+val Scala212  = "2.12.20"
 val Scala213  = "2.13.14"
 val Scala3    = "3.3.3"
 
 val CatsVersion        = "2.12.0"
-val CirceVersionV0_14  = "0.14.7"
+val CirceVersionV0_14  = "0.14.10"
 val PureConfigV0_17    = "0.17.7"
-val ScalaTestVersion   = "3.2.18"
+val ScalaTestVersion   = "3.2.19"
 val Shapeless2xVersion = "2.3.12"
 val Shapeless3xVersion = "3.4.1"
 
@@ -69,6 +69,14 @@ lazy val sharedSettings = Seq(
 
   // Turning off fatal warnings and certain annoyances during testing
   Test / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
+
+  // Disable tpolecat for Scala 2.12 only
+  Compile / tpolecatExcludeOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) => ScalacOptions.defaultConsoleExclude
+      case _ => Set.empty
+    }
+  },
 
   // ScalaDoc settings
   autoAPIMappings := true,
