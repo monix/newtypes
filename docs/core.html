@@ -1,0 +1,374 @@
+<!DOCTYPE html><html><head><title>Newtypes: Defining Newtypes</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="The Monix Developers" /><meta name="description" content="Macro-free helpers for defining newtypes in Scala." /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="Newtypes: Defining Newtypes" /><meta name="title" property="og:title" content="Newtypes: Defining Newtypes" /><meta name="og:site_name" content="Newtypes" /><meta name="og:url" content="https://newtypes.monix.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Macro-free helpers for defining newtypes in Scala." /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="Newtypes: Defining Newtypes" /><meta name="twitter:image" content="https://newtypes.monix.io/img/poster.png" /><meta name="twitter:description" content="Macro-free helpers for defining newtypes in Scala." /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:creator" content="@monix" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/css/light-style.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><div id="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"></div><span>Newtypes</span></a><button id="main-toggle" class="sidebar-toggle"><span class="close"></span></button></div><div class="sidebar-nav"> <div class="sidebar-nav-item  open"><a href="/docs/" title="Documentation" class="drop-nested">Documentation</a><i class="fa fa-angle-right"></i><div class="sub-section"> <a href="/docs/motivation.html" title="Motivation" class="">Motivation</a> <a href="/docs/core.html" title="Defining Newtypes" class="active">Defining Newtypes</a> <a href="/docs/circe.html" title="Circe JSON Integration" class="">Circe JSON Integration</a> <a href="/docs/pure-config.html" title="PureConfig Integration" class="">PureConfig Integration</a></div></div></div></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li class="search-nav"><div id="search-dropdown"><label><i class="fa fa-search"></i>Search</label><input id="search-bar" type="text" placeholder="Enter keywords here..." onclick="displayToggleSearch(event)" /><ul id="search-dropdown-content" class="dropdown dropdown-content"></ul></div></li><li id="gh-eyes-item" class="hidden-xs to-uppercase"><a href="https://github.com/monix/newtypes" target="_blank" rel="noopener noreferrer"><i class="fa fa-eye"></i><span>Watchers<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs to-uppercase"><a href="https://github.com/monix/newtypes" target="_blank" rel="noopener noreferrer"><i class="fa fa-star-o"></i><span>Stars<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="monix" data-github-repo="newtypes"><div class="content-wrapper"><section><h1 id="defining-newtypes">Defining Newtypes</h1>
+
+<p>Importing the dependency:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">libraryDependencies</span> <span class="o">+=</span> <span class="s">"io.monix"</span> <span class="o">%%</span> <span class="s">"newtypes-core"</span> <span class="o">%</span> <span class="s">"0.3.0+0-7dada65e+20240907-1754-SNAPSHOT"</span>
+</code></pre></div></div>
+
+<p><strong>Table of contents:</strong></p>
+
+<ul>
+  <li><a href="#newtype">Newtype</a>
+    <ul>
+      <li><a href="#newtypewrapped">NewtypeWrapped</a></li>
+      <li><a href="#newtypevalidated">NewtypeValidated</a></li>
+      <li><a href="#deriving-type-class-instances">Deriving type-class instances</a></li>
+    </ul>
+  </li>
+  <li><a href="#newtypek-and-newtypecovariantk">NewtypeK and NewtypeCovariantK</a></li>
+  <li><a href="#newsubtype">Newsubtype</a></li>
+  <li><a href="#encoders-and-decoders">Encoders and Decoders</a></li>
+</ul>
+
+<h2 id="newtype">Newtype</h2>
+
+<p><a href="/api/io/monix/newtypes/Newtype.html">Newtype</a> exposes the base encoding for newtypes over types with no type parameters. It provides no pre-defined builders, such that you need to provide <code class="language-plaintext highlighter-rouge">apply</code> or <code class="language-plaintext highlighter-rouge">unapply</code> by yourself:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">monix.newtypes._</span>
+
+<span class="k">type</span> <span class="kt">EmailAddress</span> <span class="o">=</span> <span class="nv">EmailAddress</span><span class="o">.</span><span class="py">Type</span>
+
+<span class="k">object</span> <span class="nc">EmailAddress</span> <span class="k">extends</span> <span class="nc">Newtype</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">apply</span><span class="o">(</span><span class="n">value</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">EmailAddress</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nf">if</span> <span class="o">(</span><span class="nv">value</span><span class="o">.</span><span class="py">contains</span><span class="o">(</span><span class="s">"@"</span><span class="o">))</span>
+      <span class="nc">Some</span><span class="o">(</span><span class="nf">unsafeCoerce</span><span class="o">(</span><span class="n">value</span><span class="o">))</span>
+    <span class="k">else</span>
+      <span class="nc">None</span>
+
+  <span class="k">def</span> <span class="nf">unapply</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ev</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=:=</span> <span class="nc">Type</span><span class="o">)</span><span class="k">:</span> <span class="kt">Some</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Some</span><span class="o">(</span><span class="nf">value</span><span class="o">(</span><span class="nf">ev</span><span class="o">(</span><span class="n">a</span><span class="o">)))</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>It’s more convenient to work with <code class="language-plaintext highlighter-rouge">NewtypeWrapped</code> or <code class="language-plaintext highlighter-rouge">NewtypeValidated</code>, as shown below.</p>
+
+<h3 id="newtypewrapped">NewtypeWrapped</h3>
+
+<p>We can use <a href="/api/io/monix/newtypes/NewtypeWrapped.html">NewtypeWrapped</a> for creating newtypes, as simple wrappers (no validation) over types with no type parameters:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">monix.newtypes._</span>
+
+<span class="k">type</span> <span class="kt">FirstName</span> <span class="o">=</span> <span class="nv">FirstName</span><span class="o">.</span><span class="py">Type</span>
+
+<span class="k">object</span> <span class="nc">FirstName</span> <span class="k">extends</span> <span class="nc">NewtypeWrapped</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span>
+
+<span class="c1">// Usage:</span>
+<span class="k">val</span> <span class="nv">fname</span> <span class="k">=</span> <span class="nc">FirstName</span><span class="o">(</span><span class="s">"Alex"</span><span class="o">)</span>
+
+<span class="c1">// To coerce into its source type again:</span>
+<span class="nv">fname</span><span class="o">.</span><span class="py">value</span>
+<span class="c1">//=&gt; val res: String = "Alex"</span>
+</code></pre></div></div>
+
+<p>Note, this is a type-safe alias, aka an “<a href="https://docs.scala-lang.org/scala3/reference/other-new-features/opaques.html">opaque type</a>”, so our <code class="language-plaintext highlighter-rouge">FirstName</code> is not seen as a <code class="language-plaintext highlighter-rouge">String</code> or vice-versa:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="k">val</span> <span class="nv">fname1</span><span class="k">:</span> <span class="kt">FirstName</span> <span class="o">=</span> <span class="s">"Alex"</span>
+</code></pre></div></div>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time too</span>
+<span class="k">val</span> <span class="nv">fname2</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="nc">FirstName</span><span class="o">(</span><span class="s">"Alex"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>Pattern matching is also possible:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fname</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">FirstName</span><span class="o">(</span><span class="n">str</span><span class="o">)</span> <span class="k">=&gt;</span> 
+    <span class="n">s</span><span class="s">"Name: $str"</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Note that due to type-erasure we are restricting the pattern matching that’s possible. This doesn’t work:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="o">(</span><span class="n">fname</span><span class="k">:</span> <span class="kt">Any</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">FirstName</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">"Matches!"</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="s">"Nope!"</span>  
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>This doesn’t work either:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="s">"Alex"</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">FirstName</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">"Matches!"</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="s">"Nope!"</span>  
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>And trying to do a regular <code class="language-plaintext highlighter-rouge">isInstanceOf</code> checks should trigger at least a Scala warning, due to the type being erased, hopefully you’re working with <code class="language-plaintext highlighter-rouge">-Xfatal-warnings</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="n">fname</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="n">ref</span><span class="k">:</span> <span class="kt">FirstName</span> <span class="o">=&gt;</span> <span class="s">"Matches!"</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="newtypevalidated">NewtypeValidated</h3>
+
+<p>Use <a href="/api/io/monix/newtypes/NewtypeValidated.html">NewtypeValidated</a> for creating newtypes that have extra validation:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">monix.newtypes._</span>
+
+<span class="k">type</span> <span class="kt">EmailAddress</span> <span class="o">=</span> <span class="nv">EmailAddress</span><span class="o">.</span><span class="py">Type</span>
+
+<span class="k">object</span> <span class="nc">EmailAddress</span> <span class="k">extends</span> <span class="nc">NewtypeValidated</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">apply</span><span class="o">(</span><span class="n">v</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Either</span><span class="o">[</span><span class="kt">BuildFailure</span><span class="o">[</span><span class="kt">Type</span><span class="o">]</span>, <span class="kt">Type</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nf">if</span> <span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">contains</span><span class="o">(</span><span class="s">"@"</span><span class="o">))</span> 
+      <span class="nc">Right</span><span class="o">(</span><span class="nf">unsafeCoerce</span><span class="o">(</span><span class="n">v</span><span class="o">))</span>
+    <span class="k">else</span> 
+      <span class="nc">Left</span><span class="o">(</span><span class="nc">BuildFailure</span><span class="o">(</span><span class="s">"missing @"</span><span class="o">))</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>We only allow strings with a certain format to be considered valid email addresses:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">EmailAddress</span><span class="o">(</span><span class="s">"noreply@alexn.org"</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">Right</span><span class="o">(</span><span class="n">address</span><span class="o">)</span> <span class="k">=&gt;</span>
+    <span class="n">s</span><span class="s">"Validated: ${address.value}"</span>
+  <span class="k">case</span> <span class="nc">Left</span><span class="o">(</span><span class="n">e</span><span class="o">)</span> <span class="k">=&gt;</span>
+    <span class="n">s</span><span class="s">"Error: $e"</span>
+<span class="o">}</span>
+<span class="c1">// res9: String = "Validated: noreply@alexn.org"</span>
+</code></pre></div></div>
+
+<p>There are cases in which the validation needs to be bypassed, which can be done via the “unsafe” builder:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">address</span> <span class="k">=</span> <span class="nv">EmailAddress</span><span class="o">.</span><span class="py">unsafe</span><span class="o">(</span><span class="s">"noreply@alexn.org"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>And, we can pattern match it to extract its value:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">address</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">EmailAddress</span><span class="o">(</span><span class="n">str</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">s</span><span class="s">"Matched: $str"</span>
+<span class="o">}</span>
+<span class="c1">// res10: String = "Matched: noreply@alexn.org"</span>
+</code></pre></div></div>
+
+<p>Note the same caveats apply for pattern matching:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="o">(</span><span class="n">address</span><span class="k">:</span> <span class="kt">Any</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">EmailAddress</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">()</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">()</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="s">"noreply@alexn.org"</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">EmailAddress</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">()</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">()</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — triggers at least a warning at compile-time</span>
+<span class="n">address</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="k">_:</span> <span class="kt">EmailAddress</span> <span class="o">=&gt;</span> <span class="o">()</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">()</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="deriving-type-class-instances">Deriving type-class instances</h3>
+
+<p>We can derive type class instances, with a <code class="language-plaintext highlighter-rouge">derive</code> helper available in <code class="language-plaintext highlighter-rouge">Newtype</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">cats._</span>
+<span class="k">import</span> <span class="nn">cats.implicits._</span>
+<span class="k">import</span> <span class="nn">monix.newtypes._</span>
+
+<span class="k">type</span> <span class="kt">FirstName</span> <span class="o">=</span> <span class="nv">FirstName</span><span class="o">.</span><span class="py">Type</span>
+
+<span class="k">object</span> <span class="nc">FirstName</span> <span class="k">extends</span> <span class="nc">NewtypeWrapped</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">{</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="nv">eq</span><span class="k">:</span> <span class="kt">Eq</span><span class="o">[</span><span class="kt">FirstName</span><span class="o">]</span> <span class="k">=</span> <span class="n">derive</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="nv">show</span><span class="k">:</span> <span class="kt">Show</span><span class="o">[</span><span class="kt">FirstName</span><span class="o">]</span> <span class="k">=</span> <span class="n">derive</span>
+<span class="o">}</span>
+
+<span class="c1">// ...</span>
+<span class="k">val</span> <span class="nv">fname</span> <span class="k">=</span> <span class="nc">FirstName</span><span class="o">(</span><span class="s">"Alex"</span><span class="o">)</span>
+
+<span class="nf">assert</span><span class="o">(</span><span class="nv">fname</span><span class="o">.</span><span class="py">show</span> <span class="o">==</span> <span class="s">"Alex"</span><span class="o">)</span>
+<span class="nf">assert</span><span class="o">(</span><span class="nc">Eq</span><span class="o">[</span><span class="kt">FirstName</span><span class="o">].</span><span class="py">eqv</span><span class="o">(</span><span class="n">fname</span><span class="o">,</span> <span class="nc">FirstName</span><span class="o">(</span><span class="s">"Alex"</span><span class="o">)))</span> 
+</code></pre></div></div>
+
+<h2 id="newtypek-and-newtypecovariantk">NewtypeK and NewtypeCovariantK</h2>
+
+<p><a href="/api/io/monix/newtypes/NewtypeK.html">NewtypeK</a> is for defining newtypes over types with an <em>invariant type parameter</em>.</p>
+
+<p><a href="(/api/io/monix/newtypes/NewtypeCovariantK.html)">NewtypeCovariantK</a> inherits from it and is for defining newtypes over types with a <em>covariant type parameter</em>.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">cats._</span>
+<span class="k">import</span> <span class="nn">cats.implicits._</span>
+<span class="k">import</span> <span class="nn">monix.newtypes._</span>
+
+<span class="k">type</span> <span class="kt">NonEmptyList</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="nv">NonEmptyList</span><span class="o">.</span><span class="py">Type</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+
+<span class="k">object</span> <span class="nc">NonEmptyList</span> <span class="k">extends</span> <span class="nc">NewtypeCovariantK</span><span class="o">[</span><span class="kt">List</span><span class="o">]</span> <span class="o">{</span>
+  <span class="c1">// Builder forces at least one element</span>
+  <span class="k">def</span> <span class="nf">apply</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">head</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">tail</span><span class="k">:</span> <span class="kt">A*</span><span class="o">)</span><span class="k">:</span> <span class="kt">NonEmptyList</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nf">unsafeCoerce</span><span class="o">(</span><span class="n">head</span> <span class="o">::</span> <span class="nv">tail</span><span class="o">.</span><span class="py">toList</span><span class="o">)</span>
+
+  <span class="c1">// Exposes (head, tail)</span>
+  <span class="k">def</span> <span class="nf">unapply</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span><span class="o">](</span><span class="n">list</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span>
+    <span class="k">implicit</span> <span class="n">ev</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">=:=</span> <span class="nc">NonEmptyList</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+  <span class="o">)</span><span class="k">:</span> <span class="kt">Some</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">List</span><span class="o">[</span><span class="kt">A</span><span class="o">])]</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="nv">l</span> <span class="k">=</span> <span class="nf">value</span><span class="o">(</span><span class="n">list</span><span class="o">)</span>
+    <span class="nc">Some</span><span class="o">((</span><span class="nv">l</span><span class="o">.</span><span class="py">head</span><span class="o">,</span> <span class="nv">l</span><span class="o">.</span><span class="py">tail</span><span class="o">))</span>
+  <span class="o">}</span>
+
+  <span class="c1">// Utilities specific for NonEmptyList</span>
+  <span class="k">implicit</span> <span class="k">final</span> <span class="k">class</span> <span class="nc">NelOps</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">val</span> <span class="nv">self</span><span class="k">:</span> <span class="kt">NonEmptyList</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span> <span class="o">{</span>
+    <span class="k">def</span> <span class="nf">head</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="nv">self</span><span class="o">.</span><span class="py">value</span><span class="o">.</span><span class="py">head</span>
+    <span class="k">def</span> <span class="nf">tail</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="nv">self</span><span class="o">.</span><span class="py">value</span><span class="o">.</span><span class="py">tail</span>
+  <span class="o">}</span>
+
+  <span class="k">implicit</span> <span class="k">def</span> <span class="nf">eq</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">Eq</span><span class="o">]</span><span class="k">:</span> <span class="kt">Eq</span><span class="o">[</span><span class="kt">NonEmptyList</span><span class="o">[</span><span class="kt">A</span><span class="o">]]</span> <span class="k">=</span>
+    <span class="n">derive</span>
+
+  <span class="c1">// Deriving type-class instance working on F[_], notice use of deriveK</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="nv">traverse</span><span class="k">:</span> <span class="kt">Traverse</span><span class="o">[</span><span class="kt">NonEmptyList</span><span class="o">]</span> <span class="k">=</span>
+    <span class="n">deriveK</span>
+
+  <span class="c1">// Deriving type-class instance working on F[_], notice use of deriveK</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="nv">monad</span><span class="k">:</span> <span class="kt">Monad</span><span class="o">[</span><span class="kt">NonEmptyList</span><span class="o">]</span> <span class="k">=</span>
+    <span class="n">deriveK</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>And usage:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">colors</span> <span class="k">=</span> <span class="nc">NonEmptyList</span><span class="o">(</span><span class="s">"Red"</span><span class="o">,</span> <span class="s">"Green"</span><span class="o">,</span> <span class="s">"Blue"</span><span class="o">)</span>
+<span class="c1">// colors: NonEmptyList.Type[String] = List("Red", "Green", "Blue")</span>
+
+<span class="nv">colors</span><span class="o">.</span><span class="py">head</span>
+<span class="c1">// res18: String = "Red"</span>
+<span class="nv">colors</span><span class="o">.</span><span class="py">tail</span>
+<span class="c1">// res19: List[String] = List("Green", "Blue")</span>
+
+<span class="c1">// Pattern matching works</span>
+<span class="n">colors</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">NonEmptyList</span><span class="o">(</span><span class="n">head</span><span class="o">,</span> <span class="n">tail</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">()</span>
+<span class="o">}</span>
+
+<span class="c1">// Covariance works</span>
+<span class="k">val</span> <span class="nv">any</span><span class="k">:</span> <span class="kt">NonEmptyList</span><span class="o">[</span><span class="kt">Any</span><span class="o">]</span> <span class="k">=</span> <span class="n">colors</span>
+<span class="c1">// any: NonEmptyList[Any] = List("Red", "Green", "Blue")</span>
+
+<span class="c1">// It can be traversed</span>
+<span class="nc">NonEmptyList</span><span class="o">(</span><span class="nc">Option</span><span class="o">(</span><span class="s">"Red"</span><span class="o">),</span> <span class="nc">Option</span><span class="o">(</span><span class="s">"Green"</span><span class="o">),</span> <span class="nc">Option</span><span class="o">(</span><span class="s">"Blue"</span><span class="o">))</span>
+  <span class="o">.</span><span class="py">sequence</span>
+<span class="c1">// res21: Option[NonEmptyList.Type[String]] = Some(</span>
+<span class="c1">//   value = List("Red", "Green", "Blue")</span>
+<span class="c1">// )</span>
+</code></pre></div></div>
+
+<p>With <code class="language-plaintext highlighter-rouge">NewtypeK</code> and <code class="language-plaintext highlighter-rouge">NewtypeCovariantK</code> you have to provide the <code class="language-plaintext highlighter-rouge">apply</code>, <code class="language-plaintext highlighter-rouge">unapply</code>, and other utilities by yourself. Which makes sense, as these are more complex types to deal with.</p>
+
+<h2 id="newsubtype">Newsubtype</h2>
+
+<p><a href="/api/io/monix/newtypes/Newsubtype.html">Newsubtype</a> exposes the base encoding for new-subtypes over types with no type parameters. It functions exactly the same as <code class="language-plaintext highlighter-rouge">Newtype</code>, except as a subtype of the underlying type instead of as an entirely new type.</p>
+
+<p>It provides the same utility classes as <a href="#newtype">Newtype</a>, including <a href="/api/io/monix/newtypes/NewsubtypeWrapped.html">NewsubtypeWrapped</a>, <a href="/api/io/monix/newtypes/NewsubtypeValidated.html">NewsubtypeValidated</a>, <a href="/api/io/monix/newtypes/NewsubtypeK.html">NewsubtypeK</a>, and <a href="/api/io/monix/newtypes/NewsubtypeCovariantK.html">NewsubtypeCovariantK</a>.</p>
+
+<p>There are two core benefits of <code class="language-plaintext highlighter-rouge">Newsubtype</code> and its variants:</p>
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">Newsubtype</code>s of primitives are unboxed in scala 2 (in scala 3 both should be unboxed as expected).</li>
+  <li>There is reduced boilerplate in dealing with the underlying type.</li>
+</ol>
+
+<p>That said, unless you know you need <code class="language-plaintext highlighter-rouge">Newsubtype</code>, you’re likely better off living with the extra boilerplate in a production system, as <code class="language-plaintext highlighter-rouge">Newsubtype</code> can lead to accidental unwrapping.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Newsubtype</code>s don’t need to declare forwarding methods or reimplement any methods on their underlying types:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">monix.newtypes._</span>
+
+<span class="k">type</span> <span class="kt">Level</span> <span class="o">=</span> <span class="nv">Level</span><span class="o">.</span><span class="py">Type</span>
+<span class="k">object</span> <span class="nc">Level</span> <span class="k">extends</span> <span class="nc">NewsubtypeWrapped</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span>
+
+<span class="k">val</span> <span class="nv">myLevel</span><span class="k">:</span> <span class="kt">Level</span> <span class="o">=</span> <span class="nc">Level</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+<span class="c1">// myLevel: Level = 5</span>
+</code></pre></div></div>
+
+<p>Thus, we can do things like call <code class="language-plaintext highlighter-rouge">+</code> from <code class="language-plaintext highlighter-rouge">Int</code> on our new subtype, however this unwraps our result to <code class="language-plaintext highlighter-rouge">Int</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">anotherLevel</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="n">myLevel</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="c1">// anotherLevel: Int = 6</span>
+</code></pre></div></div>
+
+<p>The likely desired result type doesn’t work:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ERROR — should fail at compile-time</span>
+<span class="k">val</span> <span class="nv">newLevel</span><span class="k">:</span> <span class="kt">Level</span> <span class="o">=</span> <span class="n">myLevel</span> <span class="o">+</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>We would need to re-wrap our results, which could be prohibitively expensive depending on the validation logic on the <code class="language-plaintext highlighter-rouge">Newsubtype</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">newLevel</span><span class="k">:</span> <span class="kt">Level</span> <span class="o">=</span> <span class="nc">Level</span><span class="o">(</span><span class="n">myLevel</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span>
+<span class="c1">// newLevel: Level = 6</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Newsubtype</code> can unwrap in more subtle and potentially dangerous ways. As a simple and contrived example, instances of either of <code class="language-plaintext highlighter-rouge">Map[Level, Int]</code> or <code class="language-plaintext highlighter-rouge">List[Level]</code> have <code class="language-plaintext highlighter-rouge">apply</code> methods that can take our subtype <code class="language-plaintext highlighter-rouge">Level</code> but would return dramatically different results. If we were using the <code class="language-plaintext highlighter-rouge">Map</code> apply and someone else changed the data type to <code class="language-plaintext highlighter-rouge">List</code>, our code would continue to compile but silently produce invalid results. If our <code class="language-plaintext highlighter-rouge">Level</code> were a <code class="language-plaintext highlighter-rouge">Newtype</code> instead, code using the <code class="language-plaintext highlighter-rouge">List</code> <code class="language-plaintext highlighter-rouge">apply</code> method but expecting the <code class="language-plaintext highlighter-rouge">Map</code> <code class="language-plaintext highlighter-rouge">apply</code> would now fail at compile time.</p>
+
+<h2 id="encoders-and-decoders">Encoders and Decoders</h2>
+
+<p>You can automatically derive encoders based on <code class="language-plaintext highlighter-rouge">HasExtractor</code> instances.
+All newtypes have a <code class="language-plaintext highlighter-rouge">HasExtractor</code> instance defined.</p>
+
+<p>Here’s how to automatically derive <code class="language-plaintext highlighter-rouge">io.circe.Encoder</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">monix.newtypes._</span>
+<span class="k">import</span> <span class="nn">io.circe._</span>
+
+<span class="k">implicit</span> <span class="k">def</span> <span class="nf">jsonEncoder</span><span class="o">[</span><span class="kt">T</span>, <span class="kt">S</span><span class="o">](</span><span class="k">implicit</span> 
+  <span class="n">extractor</span><span class="k">:</span> <span class="kt">HasExtractor.Aux</span><span class="o">[</span><span class="kt">T</span>, <span class="kt">S</span><span class="o">],</span>
+  <span class="n">enc</span><span class="k">:</span> <span class="kt">Encoder</span><span class="o">[</span><span class="kt">S</span><span class="o">],</span>
+<span class="o">)</span><span class="k">:</span> <span class="kt">Encoder</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">enc</span><span class="o">.</span><span class="py">apply</span><span class="o">(</span><span class="nv">extractor</span><span class="o">.</span><span class="py">extract</span><span class="o">(</span><span class="n">t</span><span class="o">))</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>And you can also derive decoders, based on <code class="language-plaintext highlighter-rouge">HasBuilder</code> instances.
+Here’s how to automatically derive <code class="language-plaintext highlighter-rouge">io.circe.Decoder</code> (validation
+included):</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">implicit</span> <span class="k">def</span> <span class="nf">jsonDecoder</span><span class="o">[</span><span class="kt">T</span>, <span class="kt">S</span><span class="o">](</span><span class="k">implicit</span> 
+  <span class="n">builder</span><span class="k">:</span> <span class="kt">HasBuilder.Aux</span><span class="o">[</span><span class="kt">T</span>, <span class="kt">S</span><span class="o">],</span>
+  <span class="n">dec</span><span class="k">:</span> <span class="kt">Decoder</span><span class="o">[</span><span class="kt">S</span><span class="o">],</span>
+<span class="o">)</span><span class="k">:</span> <span class="kt">Decoder</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="n">c</span><span class="k">:</span> <span class="kt">HCursor</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+  <span class="nv">dec</span><span class="o">.</span><span class="py">apply</span><span class="o">(</span><span class="n">c</span><span class="o">).</span><span class="py">flatMap</span> <span class="o">{</span> <span class="n">value</span> <span class="k">=&gt;</span>
+    <span class="nv">builder</span><span class="o">.</span><span class="py">build</span><span class="o">(</span><span class="n">value</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="n">value</span> <span class="k">@</span> <span class="nc">Right</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> 
+        <span class="nv">value</span><span class="o">.</span><span class="py">asInstanceOf</span><span class="o">[</span><span class="kt">Either</span><span class="o">[</span><span class="kt">DecodingFailure</span>, <span class="kt">T</span><span class="o">]]</span>
+      <span class="k">case</span> <span class="nc">Left</span><span class="o">(</span><span class="n">failure</span><span class="o">)</span> <span class="k">=&gt;</span> 
+        <span class="k">val</span> <span class="nv">msg</span> <span class="k">=</span> <span class="nv">failure</span><span class="o">.</span><span class="py">message</span><span class="o">.</span><span class="py">fold</span><span class="o">(</span><span class="s">""</span><span class="o">)(</span><span class="n">m</span> <span class="k">=&gt;</span> <span class="n">s</span><span class="s">" — $m"</span><span class="o">)</span>
+        <span class="nc">Left</span><span class="o">(</span><span class="nc">DecodingFailure</span><span class="o">(</span>
+          <span class="n">s</span><span class="s">"Invalid ${failure.typeInfo.typeLabel}$msg"</span><span class="o">,</span> 
+          <span class="nv">c</span><span class="o">.</span><span class="py">history</span>
+        <span class="o">))</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>You don’t need to define such encoders and decoders, as they are
+already defined in the <a href="/docs/circe.html">Circe integration</a>.</p>
+
+<p>But you can use <code class="language-plaintext highlighter-rouge">HasExtractor</code> and <code class="language-plaintext highlighter-rouge">HasBuilder</code> for new integrations.</p>
+</section></div></div></div></div><script src="/highlight/highlight.pack.js"></script><script src="/lunr/lunr.js"></script><script>
+// For all code blocks, copy the language from the containing div
+// to the inner code tag (where hljs expects it to be)
+const langPrefix = 'language-';
+document.querySelectorAll(`div[class^='${langPrefix}']`).forEach(function(div) {
+  div.classList.forEach(function(cssClass) {
+    if (cssClass.startsWith(langPrefix)) {
+      const lang = cssClass.substring(langPrefix.length);
+      div.querySelectorAll('pre code').forEach(function(code) {
+        code.classList.add(lang);
+      });
+    }
+  });
+});
+
+hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlightingOnLoad();
+      </script><script>console.info('\x57\x65\x62\x73\x69\x74\x65\x20\x62\x75\x69\x6c\x74\x20\x77\x69\x74\x68\x3a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x5f\x5f\x0a\x20\x20\x20\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x5f\x20\x20\x2f\x20\x2f\x5f\x20\x20\x20\x20\x20\x20\x5f\x5f\x5f\x5f\x20\x5f\x5f\x5f\x20\x20\x28\x5f\x29\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x28\x5f\x29\x20\x2f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x0a\x20\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x60\x5f\x5f\x20\x5c\x2f\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x20\x2f\x20\x5f\x5f\x2f\x20\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x0a\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x5f\x2f\x20\x2f\x20\x2f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x5f\x5f\x2f\x20\x2f\x20\x20\x2f\x20\x2f\x5f\x2f\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x20\x2f\x5f\x2f\x20\x20\x5f\x5f\x28\x5f\x5f\x20\x20\x29\x0a\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2e\x5f\x5f\x5f\x2f\x5c\x5f\x5f\x2f\x20\x20\x20\x20\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x2f\x20\x20\x20\x5c\x5f\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x0a\x0a\x68\x74\x74\x70\x73\x3a\x2f\x2f\x34\x37\x64\x65\x67\x2e\x67\x69\x74\x68\x75\x62\x2e\x69\x6f\x2f\x73\x62\x74\x2d\x6d\x69\x63\x72\x6f\x73\x69\x74\x65\x73')</script><script>((window.gitter = {}).chat = {}).options = {
+room: 'monix/monix'};</script><script src="https://sidecar.gitter.im/dist/sidecar.v1.js"></script><script src="/js/search.js"></script><script src="/js/docs.js"></script></body></html>
