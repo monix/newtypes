@@ -253,7 +253,7 @@ lazy val site = project.in(file("site"))
     Seq(
       micrositeName := projectTitle.value,
       micrositeDescription := "Macro-free helpers for defining newtypes in Scala.",
-      micrositeAuthor := "The Monix Developers",
+      micrositeAuthor := "Alexandru Nedelcu",
       micrositeTwitterCreator := "@monix",
       micrositeGithubOwner := githubOwnerID.value,
       micrositeGithubRepo := githubRelativeRepositoryID.value,
