@@ -21,3 +21,4 @@ site/Gemfile.lock
 node_modules/
 project/project
 .history
+.ruby-version
