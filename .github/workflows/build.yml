@@ -22,16 +22,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: olafurpg/setup-scala@v11
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.${{ matrix.java }}"
+          cache: 'sbt'
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+      
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
         run: |
-          sbt -J-Xmx6144m ++${{ matrix.scala }} ${{ matrix.command }}
+          ./sbt -J-Xmx6144m ++${{ matrix.scala }} ${{ matrix.command }}
         env:
           SCALA_VERSION: ${{ matrix.scala }}
           SBT_COMMAND: ${{ matrix.command }}
@@ -42,13 +46,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: olafurpg/setup-scala@v11
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
-
+          cache: 'sbt'
+          java-version: 11
+          distribution: 'temurin'
       - name: sbt ci-doc
         run: |
-          sbt -J-Xmx6144m ci-doc
+          ./sbt -J-Xmx6144m ci-doc
         env:
           SCALA_VERSION: ${{ matrix.scala }}
           SBT_COMMAND: ${{ matrix.command }}
@@ -78,10 +84,13 @@ jobs:
 
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v11
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
+          cache: 'sbt'
+          java-version: 11
+          distribution: 'temurin'
 
       - name: Install GnuPG2
         run: |
@@ -103,10 +112,14 @@ jobs:
     needs: [ publish_sonatype ]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v11
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
+          cache: 'sbt'
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
 
       - name: Set up Ruby 2.7 (for microsite)
         uses: actions/setup-ruby@v1
