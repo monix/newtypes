@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 100
           ref: ${{ github.event.inputs.ref_to_publish }}
 
-      - name: Set up JDK ${{ matrix.java-version }}
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           cache: 'sbt'
