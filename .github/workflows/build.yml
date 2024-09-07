@@ -2,9 +2,9 @@ name: build
 
 on:
   pull_request:
-    branches: ['*']
+    branches: [ main ]
   push:
-    branches: ['*']
+    branches: [ main ]
     tags: ["v[0-9]+*"]
 
 jobs:
