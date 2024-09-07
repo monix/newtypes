@@ -23,9 +23,12 @@ jobs:
           fetch-depth: 100
           ref: ${{ github.event.inputs.ref_to_publish }}
 
-      - uses: olafurpg/setup-scala@v10
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.8"
+          cache: 'sbt'
+          java-version: 8
+          distribution: 'temurin'
 
       - name: Install GnuPG2
         run: |
@@ -35,9 +38,9 @@ jobs:
         run: |
           git fetch --depth=100 origin +refs/tags/*:refs/tags/*
           if [ "$PUBLISH_STABLE_VERSION" = "true" ]; then
-            sbt ci-release
+            ./sbt ci-release
           else
-            sbt +clean +publishSigned
+            ./sbt +clean +publishSigned
           fi
         env:
           PGP_KEY_HEX: ${{ secrets.PGP_KEY_HEX }}

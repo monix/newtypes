@@ -9,7 +9,7 @@ on:
 
 jobs:
   tests:
-    name: Unit tests (scala ${{ matrix.scala }}, jvm ${{ matrix.java }})
+    name: Unit tests / JVM ${{ matrix.java }}
     strategy:
       fail-fast: false   
       matrix:
