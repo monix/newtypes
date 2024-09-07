@@ -1,6 +1,6 @@
 # Monix's Newtypes
 
-[![Build](https://github.com/monix/newtypes/workflows/build/badge.svg?branch=main)](https://github.com/monix/newtypes/actions?query=branch%3Amain+workflow%3Abuild) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13)
+[![Build](https://github.com/monix/newtypes/actions/workflows/build.yml/badge.svg)](https://github.com/monix/newtypes/actions/workflows/build.yml)
 
 Macro-free helpers for defining newtypes in Scala, cross-compiled to Scala 3.
 
