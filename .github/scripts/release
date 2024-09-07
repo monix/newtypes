@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 git fetch --depth=100 origin +refs/tags/*:refs/tags/*
 
