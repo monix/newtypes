@@ -210,10 +210,12 @@ lazy val root = project.in(file("."))
   .enablePlugins(ScalaUnidocPlugin)
   .disablePlugins(MimaPlugin)
   .aggregate(
-    coreJVM,
     coreJS,
-    integrationCirceV014JVM,
+    coreJVM,
+    coreNative,
     integrationCirceV014JS,
+    integrationCirceV014JVM,
+    integrationCirceV014Native,
     integrationPureConfigV017JVM,
   )
   .configure(defaultPlugins)
@@ -226,8 +228,7 @@ lazy val root = project.in(file("."))
     // Reloads build.sbt changes whenever detected
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     // Deactivate sbt's linter for some temporarily unused keys
-    Global / excludeLintKeys ++= Set(
-      githubRelativeRepositoryID,
+    Global / excludeLintKeys ++= Set( githubRelativeRepositoryID,
     ),
     // Use Node.js in tests
     Global / scalaJSStage := FastOptStage,
@@ -274,7 +275,7 @@ lazy val site = project.in(file("site"))
       ),
       // https://github.com/47degrees/github4s
       libraryDependencies ++= Seq(
-        "com.47deg" %% "github4s" % "0.29.1",
+        "com.47deg" %% "github4s" % "0.33.3",
         "io.circe" %%% "circe-parser" % CirceVersionV0_14,
         "com.github.pureconfig" %%% "pureconfig" % PureConfigV0_17,
       ),
@@ -318,7 +319,7 @@ lazy val site = project.in(file("site"))
     )
   }
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
   .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
@@ -349,6 +350,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+lazy val coreNative = core.native
 
 // ---
 def integrationSharedSettings(other: Setting[_]*) =
@@ -378,7 +380,7 @@ def circeSharedSettings(ver: String) =
     )
   )
 
-lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
+lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .in(file("integration-circe/v0.14"))
   .jsConfigure(_.disablePlugins(MimaPlugin))
@@ -390,6 +392,7 @@ lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
 
 lazy val integrationCirceV014JVM = integrationCirceV014.jvm
 lazy val integrationCirceV014JS  = integrationCirceV014.js
+lazy val integrationCirceV014Native = integrationCirceV014.native
 
 // -----
 def pureConfigSharedSettings(ver: String) =

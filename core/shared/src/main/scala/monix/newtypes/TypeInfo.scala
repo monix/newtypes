@@ -115,8 +115,8 @@ private[newtypes] sealed trait TypeInfoLevel0 {
       TypeInfo[T](typeName = name, typeLabel = name, packageName = "scala", typeParams = Nil)
 
     val c = tag.runtimeClass
-    c.getSimpleName match {
-      case "int" => primitive("Int")
+    c.getSimpleName.toLowerCase().replaceAll("^primitive", "") match {
+      case "int"  => primitive("Int")
       case "long" => primitive("Long")
       case "short" => primitive("Short")
       case "byte" => primitive("Byte")
