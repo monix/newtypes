@@ -16,7 +16,7 @@ jobs:
   publish:
     name: Publish to Sonatype (Request)
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
