@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")/../.."
+
 git fetch --depth=100 origin +refs/tags/*:refs/tags/*
 
 if [ "$PUBLISH_STABLE_VERSION" != "true" ]; then
@@ -13,8 +15,8 @@ echo "PUBLISH_STABLE_VERSION=$PUBLISH_STABLE_VERSION"
 
 if [[ "$PUBLISH_STABLE_VERSION" = "true" ]]; then
   echo "Publishing stable version ..."
-  exec sbt +clean +publishSigned sonatypeBundleRelease
+  exec ./sbt +clean +publishSigned sonatypeBundleRelease
 else
   echo "Publishing snapshot ..."
-  exec sbt +clean +publishSigned
+  exec ./sbt +clean +publishSigned
 fi
