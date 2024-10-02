@@ -43,14 +43,14 @@ trait DerivedCirceCodec extends DerivedCirceEncoder with DerivedCirceDecoder
   */
 trait DerivedCirceDecoder {
   implicit def jsonDecoder[T, S](implicit 
-    builder: HasBuilder.Aux[T, S],
+    builder: HasBuilder.Aux[T, BuildFailure[T], S],
     dec: Decoder[S],
   ): Decoder[T] = {
     jsonDecode(_)
   }
 
   protected def jsonDecode[T, S](c: HCursor)(implicit
-    builder: HasBuilder.Aux[T, S],
+    builder: HasBuilder.Aux[T, BuildFailure[T], S],
     dec: Decoder[S],
   ): Decoder.Result[T] =
     dec.apply(c).flatMap { value =>

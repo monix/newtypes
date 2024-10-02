@@ -82,8 +82,8 @@ object NewtypeKCirceCodecSuite {
     def apply[A](first: A, rest: List[A]): Type[A] =
       unsafeCoerce(first :: rest)
 
-    implicit final def builder[A: TypeInfo]: HasBuilder.Aux[Type[A], List[A]] =
-      new HasBuilder[Type[A]] {
+    implicit final def builder[A: TypeInfo]: HasBuilder.Aux[Type[A], BuildFailure[Type[A]], List[A]] =
+      new HasBuilder[Type[A], BuildFailure[Type[A]]] {
         type Source = List[A]
 
         override def build(value: List[A]): Either[BuildFailure[Type[A]], Type[A]] =
@@ -105,8 +105,8 @@ object NewtypeKCirceCodecSuite {
     def apply[A](first: A, rest: List[A]): Type[A] =
       unsafeCoerce(first :: rest)
 
-    implicit final def builder[A: TypeInfo]: HasBuilder.Aux[Type[A], List[A]] =
-      new HasBuilder[Type[A]] {
+    implicit final def builder[A: TypeInfo]: HasBuilder.Aux[Type[A], BuildFailure[Type[A]], List[A]] =
+      new HasBuilder[Type[A], BuildFailure[Type[A]]] {
         type Source = List[A]
 
         override def build(value: List[A]): Either[BuildFailure[Type[A]], Type[A]] =
