@@ -39,7 +39,7 @@ trait DerivedPureConfigConvert extends DerivedPureConfigReader with DerivedPureC
   */
 trait DerivedPureConfigReader {
   implicit def pureConfigReader[T, S](implicit 
-    builder: HasBuilder.Aux[T, S],
+    builder: HasBuilder.Aux[T, BuildFailure[T], S],
     reader: ConfigReader[S],
   ): ConfigReader[T] = {
     reader.emap { value =>

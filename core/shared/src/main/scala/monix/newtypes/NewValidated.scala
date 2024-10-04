@@ -65,8 +65,8 @@ private[newtypes] trait NewValidated[Src] { self: NewEncoding[Src] =>
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(ev(a).value)
 
-  implicit final val builder: HasBuilder.Aux[Type, Src] =
-    new HasBuilder[Type] {
+  implicit final val builder: HasBuilder.Aux[Type, BuildFailure[Type], Src] =
+    new HasBuilder[Type, BuildFailure[Type]] {
       type Source = Src
       def build(value: Src): Either[BuildFailure[Type], Type] = apply(value)
     }

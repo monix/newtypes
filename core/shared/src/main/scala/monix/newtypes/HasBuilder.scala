@@ -25,16 +25,16 @@ package monix.newtypes
   *
   * @see [[HasExtractor]] for deriving encoders.
   */
-trait HasBuilder[Type] {
+trait HasBuilder[Type, +Failure <: BuildFailure[Type]] {
   type Source
 
-  def build(value: Source): Either[BuildFailure[Type], Type]
+  def build(value: Source): Either[Failure, Type]
 }
 
 object HasBuilder {
-  type Aux[T, S] = HasBuilder[T] { type Source = S }
+  type Aux[T, +F <: BuildFailure[T], S] = HasBuilder[T, F] { type Source = S }
 
-  def apply[T](implicit ev: HasBuilder[T]): ev.type = ev
+  def apply[T, F <: BuildFailure[T]](implicit ev: HasBuilder[T, F]): ev.type = ev
 }
 
 /**

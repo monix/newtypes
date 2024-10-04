@@ -73,8 +73,8 @@ private[newtypes] trait NewWrapped[Src] { self: NewEncoding[Src] =>
   final def unapply[A](a: A)(implicit ev: A =:= Type): Some[Src] =
     Some(value(ev(a)))
 
-  implicit final val builder: HasBuilder.Aux[Type, Src] =
-    new HasBuilder[Type] {
+  implicit final val builder: HasBuilder.Aux[Type, Nothing, Src] =
+    new HasBuilder[Type, Nothing] {
       type Source = Src
       def build(value: Src) = Right(apply(value))
     }

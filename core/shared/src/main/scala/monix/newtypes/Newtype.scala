@@ -35,8 +35,8 @@ package monix.newtypes
   * 
   *     // Recommended instance, but not required; 
   *     // use Newtype.Validated to get rid of this boilerplate ;-)
-  *     implicit val builder: HasBuilder.Aux[EmailAddress, String] =
-  *       new HasBuilder[EmailAddress] {
+  *     implicit val builder: HasBuilder.Aux[EmailAddress, String, BuildFailure[Type]] =
+  *       new HasBuilder[EmailAddress, BuildFailure[Type]] {
   *         type Source = String
   * 
   *         def build(v: String): Either[BuildFailure[Type], Type] =
