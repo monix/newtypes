@@ -344,7 +344,7 @@ included):
 
 ```scala mdoc:silent
 implicit def jsonDecoder[T, S](implicit 
-  builder: HasBuilder.Aux[T, S],
+  builder: HasBuilder.Aux[T, BuildFailure[T], S],
   dec: Decoder[S],
 ): Decoder[T] = (c: HCursor) => {
   dec.apply(c).flatMap { value =>
