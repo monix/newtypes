@@ -1,5 +1,5 @@
 addSbtPlugin("com.47deg"          % "sbt-microsites"                % "1.4.4")
-addSbtPlugin("com.github.sbt"     % "sbt-dynver"                    % "5.0.1")
+addSbtPlugin("com.github.sbt"     % "sbt-dynver"                    % "5.1.0")
 addSbtPlugin("com.github.sbt"     % "sbt-pgp"                       % "2.2.1")
 addSbtPlugin("com.github.sbt"     % "sbt-unidoc"                    % "0.5.0")
 addSbtPlugin("com.typesafe"       % "sbt-mima-plugin"               % "1.1.4")
