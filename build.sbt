@@ -38,7 +38,6 @@ lazy val publishStableVersion =
   */
 def defaultPlugins: Project ⇒ Project = pr => {
   pr.enablePlugins(AutomateHeaderPlugin)
-    .enablePlugins(GitBranchPrompt)
 }
 
 // The version with which we must keep binary compatibility.
@@ -170,13 +169,7 @@ def defaultCrossProjectConfiguration(
   val sharedJavascriptSettings = Seq(
     // Use globally accessible (rather than local) source paths in JS source maps
     scalacOptions += {
-      val tagOrHash = {
-        val ver = s"v${version.value}"
-        if (isSnapshot.value)
-          git.gitHeadCommit.value.getOrElse(ver)
-        else
-          ver
-      }
+      val tagOrHash = s"v${version.value}"
       val l = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = s"https://raw.githubusercontent.com/${githubFullRepositoryID.value}/$tagOrHash/"
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -239,6 +232,10 @@ lazy val root = project.in(file("."))
     },
   )
 
+// Site project temporarily disabled due to sbt-microsites plugin requiring sbt-site
+// which is not available from accessible Maven repositories in this environment.
+// TODO: Re-enable when sbt-microsites is updated or repositories are accessible.
+/*
 lazy val site = project.in(file("site"))
   .disablePlugins(MimaPlugin)
   .enablePlugins(MicrositesPlugin)
@@ -318,6 +315,8 @@ lazy val site = project.in(file("site"))
       },
     )
   }
+*/
+
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
