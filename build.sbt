@@ -38,6 +38,7 @@ lazy val publishStableVersion =
   */
 def defaultPlugins: Project ⇒ Project = pr => {
   pr.enablePlugins(AutomateHeaderPlugin)
+    .enablePlugins(GitBranchPrompt)
 }
 
 // The version with which we must keep binary compatibility.
@@ -169,7 +170,13 @@ def defaultCrossProjectConfiguration(
   val sharedJavascriptSettings = Seq(
     // Use globally accessible (rather than local) source paths in JS source maps
     scalacOptions += {
-      val tagOrHash = s"v${version.value}"
+      val tagOrHash = {
+        val ver = s"v${version.value}"
+        if (isSnapshot.value)
+          git.gitHeadCommit.value.getOrElse(ver)
+        else
+          ver
+      }
       val l = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = s"https://raw.githubusercontent.com/${githubFullRepositoryID.value}/$tagOrHash/"
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -234,30 +241,83 @@ lazy val root = project.in(file("."))
 
 lazy val site = project.in(file("site"))
   .disablePlugins(MimaPlugin)
-  // MicrositesPlugin disabled due to sbt-site dependency issue with blocked repositories
-  // .enablePlugins(MicrositesPlugin)
+  .enablePlugins(MicrositesPlugin)
   .enablePlugins(MdocPlugin)
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
   .dependsOn(coreJVM)
   .dependsOn(integrationCirceV014JVM)
   .dependsOn(integrationPureConfigV017JVM)
-  .settings(
-    // https://github.com/47degrees/github4s
-    libraryDependencies ++= Seq(
-      "com.47deg" %% "github4s" % "0.33.3",
-      "io.circe" %%% "circe-parser" % CirceVersionV0_14,
-      "com.github.pureconfig" %%% "pureconfig" % PureConfigV0_17,
-    ),
-    Compile / sourceDirectory := baseDirectory.value / "src",
-    Test / sourceDirectory := baseDirectory.value / "test",
-    mdocIn := (Compile / sourceDirectory).value / "mdoc",
-    tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
-    mdocVariables := Map(
-      "VERSION" -> version.value,
-    ),
-  )
+  .settings {
+    import microsites._
+    Seq(
+      micrositeName := projectTitle.value,
+      micrositeDescription := "Macro-free helpers for defining newtypes in Scala.",
+      micrositeAuthor := "Alexandru Nedelcu",
+      micrositeTwitterCreator := "@monix",
+      micrositeGithubOwner := githubOwnerID.value,
+      micrositeGithubRepo := githubRelativeRepositoryID.value,
+      micrositeUrl := projectWebsiteRootURL.value.replaceAll("[/]+$", ""),
+      micrositeBaseUrl := projectWebsiteBasePath.value.replaceAll("[/]+$", ""),
+      micrositeDocumentationUrl := s"${projectWebsiteFullURL.value.replaceAll("[/]+$", "")}/${docsMappingsAPIDir.value}/",
+      micrositeGitterChannelUrl := githubFullRepositoryID.value,
+      micrositeFooterText := None,
+      micrositeHighlightTheme := "atom-one-light",
+      micrositePalette := Map(
+        "brand-primary" -> "#3e5b95",
+        "brand-secondary" -> "#294066",
+        "brand-tertiary" -> "#2d5799",
+        "gray-dark" -> "#49494B",
+        "gray" -> "#7B7B7E",
+        "gray-light" -> "#E5E5E6",
+        "gray-lighter" -> "#F4F3F4",
+        "white-color" -> "#FFFFFF"
+      ),
+      // https://github.com/47degrees/github4s
+      libraryDependencies ++= Seq(
+        "com.47deg" %% "github4s" % "0.33.3",
+        "io.circe" %%% "circe-parser" % CirceVersionV0_14,
+        "com.github.pureconfig" %%% "pureconfig" % PureConfigV0_17,
+      ),
+      micrositePushSiteWith := GitHub4s,
+      micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
+      micrositeExtraMdFilesOutput := (Compile / resourceManaged).value / "jekyll",
+      micrositeConfigYaml := ConfigYml(
+        yamlPath = Some((Compile / resourceDirectory).value / "microsite" / "_config.yml")
+      ),
+      makeSite / mappings ++= Seq(
+        ((Compile / resourceDirectory).value / "microsite" / "CNAME") -> "CNAME",
+      ),
+      micrositeExtraMdFiles := Map(
+        file("README.md") -> ExtraMdFileConfig("index.md", "page", Map("title" -> "Home", "section" -> "home", "position" -> "100")),
+        file("CONTRIBUTING.md") -> ExtraMdFileConfig("CONTRIBUTING.md", "page", Map("title" -> "Contributing", "section" -> "contributing", "position" -> "120")),
+        file("CODE_OF_CONDUCT.md") -> ExtraMdFileConfig("CODE_OF_CONDUCT.md", "page", Map("title" -> "Code of Conduct", "section" -> "code of conduct", "position" -> "130")),
+        file("LICENSE.md") -> ExtraMdFileConfig("LICENSE.md", "page", Map("title" -> "License", "section" -> "license", "position" -> "140")),
+      ),
+      docsMappingsAPIDir := s"api",
+      addMappingsToSiteDir(root / ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
+      Compile / sourceDirectory := baseDirectory.value / "src",
+      Test / sourceDirectory := baseDirectory.value / "test",
+      mdocIn := (Compile / sourceDirectory).value / "mdoc",
+      tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
+      mdocVariables := Map(
+        "VERSION" -> version.value,
+      ),
+
+      Compile / run := {
+        import scala.sys.process._
+
+        val s: TaskStreams = streams.value
+        val shell: Seq[String] = if (sys.props("os.name").contains("Windows")) Seq("cmd", "/c") else Seq("bash", "-c")
+
+        val jekyllServe: String = s"jekyll serve --open-url --baseurl ${(Compile / micrositeBaseUrl).value}"
+
+        s.log.info("Running Jekyll...")
+        Process(shell :+ jekyllServe, (Compile / micrositeExtraMdFilesOutput).value) !
+      },
+    )
+  }
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)

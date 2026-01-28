@@ -1,5 +1,4 @@
-// Temporarily commented out due to sbt-site dependency issue with blocked repositories
-// addSbtPlugin("com.47deg"          % "sbt-microsites"                % "1.4.4")
+addSbtPlugin("com.47deg"          % "sbt-microsites"                % "1.4.4")
 addSbtPlugin("com.github.sbt"     % "sbt-dynver"                    % "5.1.1")
 addSbtPlugin("com.github.sbt"     % "sbt-pgp"                       % "2.3.1")
 addSbtPlugin("com.github.sbt"     % "sbt-unidoc"                    % "0.6.1")
