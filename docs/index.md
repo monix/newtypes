@@ -1,5 +1,4 @@
 ---
-layout: docs
 title:  "Documentation"
 position: 105
 ---
@@ -7,7 +6,7 @@ position: 105
 The packages are published on Maven Central:
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-core" % "{{ projectVersion }}"
 ```
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13)
