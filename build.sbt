@@ -1,7 +1,6 @@
 import BuildKeys._
 import Boilerplate._
 
-import com.github.sbt.git.SbtGit.GitKeys._
 import org.typelevel.scalacoptions.ScalacOptions
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
@@ -59,7 +58,7 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "newtypes",
 
   organization := "io.monix",
-  scalaVersion := Scala213,
+  scalaVersion := Scala3,
   crossScalaVersions := Seq(Scala212, Scala213, Scala3),
 
   // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
@@ -158,11 +157,7 @@ lazy val sharedSettings = Seq(
 
   // -- Settings meant for deployment on oss.sonatype.org
   sonatypeProfileName := organization.value,
-
-  // -- Issues with JGit
 )
-
-Global / useConsoleForROGit := false
 
 /**
   * Shared configuration across all sub-projects with actual code to be published.
