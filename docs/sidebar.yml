@@ -1,0 +1,6 @@
+index: ./index.md
+subsection:
+  - page: ./motivation.md
+  - page: ./core.md
+  - page: ./circe.md
+  - page: ./pure-config.md

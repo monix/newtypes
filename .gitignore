@@ -17,7 +17,6 @@ project/metals.sbt
 .metals
 .bloop
 .bsp
-site/Gemfile.lock
 node_modules/
 project/project
 .history

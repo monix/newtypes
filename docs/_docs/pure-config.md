@@ -1,5 +1,4 @@
 ---
-layout: docs
 title:  "Integration with PureConfig (HOCON configuration files)"
 ---
 
@@ -9,7 +8,7 @@ Importing the [PureConfig](https://github.com/pureconfig/pureconfig) integration
 
 ```scala
 // For Circe version 0.14.x
-libraryDependencies += "io.monix" %% "newtypes-pureconfig-v0-17" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-pureconfig-v0-17" % "{{ projectVersion }}"
 ```
 
 Usage:

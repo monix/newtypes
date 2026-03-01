@@ -1,5 +1,4 @@
 ---
-layout: docs
 title:  Defining Newtypes
 ---
 
@@ -8,7 +7,7 @@ title:  Defining Newtypes
 Importing the dependency:
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-core" % "{{ projectVersion }}"
 ```
 
 **Table of contents:**
@@ -23,7 +22,7 @@ libraryDependencies += "io.monix" %% "newtypes-core" % "@VERSION@"
 
 ## Newtype
 
-[Newtype]({{ site.api_baseurl }}/io/monix/newtypes/Newtype.html) exposes the base encoding for newtypes over types with no type parameters. It provides no pre-defined builders, such that you need to provide `apply` or `unapply` by yourself:
+[[monix.newtypes.Newtype]] exposes the base encoding for newtypes over types with no type parameters. It provides no pre-defined builders, such that you need to provide `apply` or `unapply` by yourself:
 
 ```scala
 import monix.newtypes._
@@ -46,7 +45,7 @@ It's more convenient to work with `NewtypeWrapped` or `NewtypeValidated`, as sho
 
 ### NewtypeWrapped
 
-We can use [NewtypeWrapped]({{ site.api_baseurl }}/io/monix/newtypes/NewtypeWrapped.html) for creating newtypes, as simple wrappers (no validation) over types with no type parameters:
+We can use [[monix.newtypes.NewtypeWrapped]] for creating newtypes, as simple wrappers (no validation) over types with no type parameters:
 
 ```scala mdoc:reset:silent
 import monix.newtypes._
@@ -115,7 +114,7 @@ fname match {
 
 ### NewtypeValidated
 
-Use [NewtypeValidated]({{ site.api_baseurl }}/io/monix/newtypes/NewtypeValidated.html) for creating newtypes that have extra validation:
+Use [[monix.newtypes.NewtypeValidated]] for creating newtypes that have extra validation:
 
 ```scala mdoc:reset:silent
 import monix.newtypes._
@@ -209,9 +208,9 @@ assert(Eq[FirstName].eqv(fname, FirstName("Alex")))
 ## NewtypeK and NewtypeCovariantK
 
 
-[NewtypeK]({{ site.api_baseurl }}/io/monix/newtypes/NewtypeK.html) is for defining newtypes over types with an *invariant type parameter*.
+[[monix.newtypes.NewtypeK]] is for defining newtypes over types with an *invariant type parameter*.
 
-[NewtypeCovariantK](({{ site.api_baseurl }}/io/monix/newtypes/NewtypeCovariantK.html)) inherits from it and is for defining newtypes over types with a *covariant type parameter*.
+[[monix.newtypes.NewtypeCovariantK]] inherits from it and is for defining newtypes over types with a *covariant type parameter*.
 
 ```scala mdoc:reset:silent
 import cats._
@@ -277,9 +276,9 @@ With `NewtypeK` and `NewtypeCovariantK` you have to provide the `apply`, `unappl
 
 ## Newsubtype
 
-[Newsubtype]({{ site.api_baseurl }}/io/monix/newtypes/Newsubtype.html) exposes the base encoding for new-subtypes over types with no type parameters. It functions exactly the same as `Newtype`, except as a subtype of the underlying type instead of as an entirely new type.
+[[monix.newtypes.Newsubtype]] exposes the base encoding for new-subtypes over types with no type parameters. It functions exactly the same as `Newtype`, except as a subtype of the underlying type instead of as an entirely new type.
 
-It provides the same utility classes as [Newtype](#newtype), including [NewsubtypeWrapped]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeWrapped.html), [NewsubtypeValidated]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeValidated.html), [NewsubtypeK]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeK.html), and [NewsubtypeCovariantK]({{ site.api_baseurl }}/io/monix/newtypes/NewsubtypeCovariantK.html).
+It provides the same utility classes as [Newtype](#newtype), including [[monix.newtypes.NewsubtypeWrapped]], [[monix.newtypes.NewsubtypeValidated]], [[monix.newtypes.NewsubtypeK]], and [[monix.newtypes.NewsubtypeCovariantK]].
 
 There are two core benefits of `Newsubtype` and its variants:
 1. `Newsubtype`s of primitives are unboxed in scala 2 (in scala 3 both should be unboxed as expected).
