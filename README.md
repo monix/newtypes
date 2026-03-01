@@ -1,7 +1,5 @@
 # Monix's Newtypes
 
-[![Build](https://github.com/monix/newtypes/actions/workflows/build.yml/badge.svg)](https://github.com/monix/newtypes/actions/workflows/build.yml)
-
 Macro-free helpers for defining newtypes in Scala, cross-compiled to Scala 3.
 
 ## Usage

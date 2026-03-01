@@ -9,8 +9,6 @@ The packages are published on Maven Central:
 libraryDependencies += "io.monix" %% "newtypes-core" % "{{ projectVersion }}"
 ```
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13)
-
 ## Quick sample
 
 ```scala mdoc:silent
@@ -32,4 +30,9 @@ val name = Firstname("Alex")
 name.value
 ```
 
-See the documentation menu for the available topics.
+## Documentation
+
+- [Motivation](./docs/motivation.html)
+- [Defining Newtypes](./docs/core.html)
+- [Integration with Circe (JSON encoding/decoding)](./docs/circe.html)
+- [Integration with PureConfig (HOCON configuration files)](./docs/pure-config.html)
