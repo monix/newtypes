@@ -28,7 +28,7 @@ addCommandAlias("ci-test-all", "+ci-test")
 addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;package")
 addCommandAlias("ci-doc",      s";project root ;++$Scala3! ;clean ;unidoc")
 addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
-addCommandAlias("ci-release",  ";+publishSigned ;sonatypeUpload")
+addCommandAlias("ci-release",  ";+publishSigned ;sonatypeBundleRelease")
 addCommandAlias( 
   "ci-publish-local", 
   "+publishLocalSigned"
