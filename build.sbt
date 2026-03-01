@@ -9,10 +9,11 @@ import sbtcrossproject.Platform
 // ---------------------------------------------------------------------------
 // Commands
 
-addCommandAlias("ci-test",    ";clean;Test/compile;test;mimaReportBinaryIssues;package")
-addCommandAlias("ci-doc",     ";project root ;++3.3.7! ;clean ;unidoc")
-addCommandAlias("ci",         ";project root ;reload ;+ci-test ;ci-doc")
-addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
+addCommandAlias("ci-test-all", "+ci-test")
+addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;package")
+addCommandAlias("ci-doc",      ";project root ;++3.3.7! ;clean ;unidoc")
+addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
+addCommandAlias("ci-release",  ";+publishSigned ;sonatypeBundleRelease")
 
 // ---------------------------------------------------------------------------
 // Versions

@@ -14,8 +14,8 @@ jobs:
       fail-fast: false   
       matrix:
         os: [ubuntu-latest]
-        java: [8, 11, 21]
-        command: ["ci-test"]
+        java: [17, 21]
+        command: ["ci-test-all"]
 
     runs-on: ${{ matrix.os }}
 
