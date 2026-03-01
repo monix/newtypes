@@ -228,7 +228,7 @@ lazy val root = project.in(file("."))
       (baseDirectory.value / "docs").getAbsolutePath,
       "-snippet-compiler:nocompile",
       "-doc-root-content",
-      file("./docs/index.md").getAbsolutePath
+      file("./docs/index.md").getAbsolutePath,
     ),
 
     // Try really hard to not execute tasks in parallel ffs

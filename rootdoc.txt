@@ -1,6 +1,0 @@
-Macro-free helpers for defining newtypes in Scala.
-
-Links:
-
- - [[https://newtypes.monix.io/ Homepage]]
- - [[https://github.com/monix/newtypes GitHub repository]]
