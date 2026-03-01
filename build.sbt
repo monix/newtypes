@@ -5,15 +5,7 @@ import org.typelevel.scalacoptions.ScalacOptions
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
 import sbtcrossproject.Platform
-
-// ---------------------------------------------------------------------------
-// Commands
-
-addCommandAlias("ci-test-all", "+ci-test")
-addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;package")
-addCommandAlias("ci-doc",      ";project root ;++3.3.7! ;clean ;unidoc")
-addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
-addCommandAlias("ci-release",  ";+publishSigned ;sonatypeBundleRelease")
+import xerial.sbt.Sonatype.sonatypeCentralHost
 
 // ---------------------------------------------------------------------------
 // Versions
@@ -28,6 +20,19 @@ val PureConfigV0_17    = "0.17.8"
 val ScalaTestVersion   = "3.2.19"
 val Shapeless2xVersion = "2.3.12"
 val Shapeless3xVersion = "3.4.1"
+
+// ---------------------------------------------------------------------------
+// Commands
+
+addCommandAlias("ci-test-all", "+ci-test")
+addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;package")
+addCommandAlias("ci-doc",      s";project root ;++$Scala3! ;clean ;unidoc")
+addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
+addCommandAlias("ci-release",  ";+publishSigned ;sonatypeUpload")
+addCommandAlias( 
+  "ci-publish-local", 
+  "+publishLocalSigned"
+)
 
 // ---------------------------------------------------------------------------
 
@@ -115,7 +120,7 @@ lazy val sharedSettings = Seq(
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false }, // removes optional dependencies
 
-  licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+  licenses := List(License.Apache2),
   homepage := Some(url(projectWebsiteFullURL.value)),
   headerLicense := Some {
     val years = {
@@ -157,8 +162,9 @@ lazy val sharedSettings = Seq(
       url=url("https://alexn.org")
     )),
 
-  // -- Settings meant for deployment on oss.sonatype.org
-  sonatypeProfileName := organization.value,
+  // -- Settings meant for deployment on Sonatype
+  sonatypeCredentialHost := sonatypeCentralHost,
+  usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "")),
 )
 
 /**

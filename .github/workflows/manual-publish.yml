@@ -13,7 +13,7 @@ on:
         default: "true"
 
 jobs:
-  publish:
+  publish_sonatype:
     name: Publish to Sonatype (Request)
 
     runs-on: ubuntu-latest
@@ -27,24 +27,52 @@ jobs:
         uses: actions/setup-java@v4
         with:
           cache: 'sbt'
-          java-version: 11
+          java-version: 17
           distribution: 'temurin'
 
-      - name: Install GnuPG2
+      - name: .github/scripts/release
         run: |
-          ./.github/scripts/setup-pgp
-
-      - name: sbt ci-release
-        run: |
-          git fetch --depth=100 origin +refs/tags/*:refs/tags/*
-          if [ "$PUBLISH_STABLE_VERSION" = "true" ]; then
-            ./sbt ci-release
-          else
-            ./sbt +clean +publishSigned
-          fi
+          .github/scripts/release
         env:
           PGP_KEY_HEX: ${{ secrets.PGP_KEY_HEX }}
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           PUBLISH_STABLE_VERSION: ${{ github.event.inputs.stable_version }}
+          GITHUB_REF: ${{ github.event.inputs.ref_to_publish }}
+
+  publish_docs:
+    name: Publish Website
+    needs: [ publish_sonatype ]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          ref: ${{ github.event.inputs.ref_to_publish }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          cache: 'sbt'
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Generate Scaladoc website
+        run: ./sbt -J-Xmx6144m ci-doc
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/scala-3.3.7/unidoc
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
