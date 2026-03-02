@@ -28,11 +28,12 @@ NOTE: the [version scheme](https://www.scala-lang.org/blog/2021/02/16/preventing
 
 ### Documentation
 
-- [ScalaDoc API](https://newtypes.monix.io/api/)
+- [ScalaDoc API](https://newtypes.monix.io/monix/newtypes.html)
 - [Website](https://newtypes.monix.io/docs/)
   - [Motivation](https://newtypes.monix.io/docs/motivation.html)
   - [Defining Newtypes](https://newtypes.monix.io/docs/core.html)
   - [Circe JSON integration](https://newtypes.monix.io/docs/circe.html)
+  - [PureConfig integration](https://newtypes.monix.io/docs/pure-config.html)
 
 ## Acknowledgements
 
