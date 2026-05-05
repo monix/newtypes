@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           cache: 'sbt'
-          java-version: 8
+          java-version: 11
           distribution: 'temurin'
 
       - name: Install GnuPG2

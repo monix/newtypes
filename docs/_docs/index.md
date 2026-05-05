@@ -1,18 +1,12 @@
----
-layout: docs
-title:  "Documentation"
-position: 105
----
+## Usage
 
 The packages are published on Maven Central:
 
 ```scala
-libraryDependencies += "io.monix" %% "newtypes-core" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-core" % "{{ projectVersion }}"
 ```
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.monix/newtypes-core_2.13)
-
-## Quick sample
+### Quick sample
 
 ```scala mdoc:silent
 import monix.newtypes._
@@ -33,4 +27,9 @@ val name = Firstname("Alex")
 name.value
 ```
 
-See the documentation menu for the available topics.
+## Documentation
+
+- [Motivation](./motivation.md)
+- [Defining Newtypes](./core.md)
+- [Integration with Circe (JSON encoding/decoding)](./circe.md)
+- [Integration with PureConfig (HOCON configuration files)](./pure-config.md)

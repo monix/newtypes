@@ -103,8 +103,6 @@ object Boilerplate {
     ScalaUnidoc / unidoc / scalacOptions ++=
       Opts.doc.sourceUrl(s"https://github.com/${githubFullRepositoryID.value}/tree/v${version.value}€{FILE_PATH}.scala"),
     ScalaUnidoc / unidoc / scalacOptions ++=
-      Seq("-doc-root-content", file("rootdoc.txt").getAbsolutePath),
-    ScalaUnidoc / unidoc / scalacOptions ++=
       Opts.doc.version(version.value)
   )
 }

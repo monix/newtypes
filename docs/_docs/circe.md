@@ -1,5 +1,4 @@
 ---
-layout: docs
 title:  "Integration with Circe (JSON encoding/decoding)"
 ---
 
@@ -9,7 +8,7 @@ Importing the [Circe](https://github.com/circe/circe) integration:
 
 ```scala
 // For Circe version 0.14.x
-libraryDependencies += "io.monix" %% "newtypes-circe-v0-14" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-circe-v0-14" % "{{ projectVersion }}"
 ```
 
 Usage:
