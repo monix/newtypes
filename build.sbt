@@ -20,13 +20,11 @@ val Scala212  = "2.12.15"
 val Scala213  = "2.13.8"
 val Scala3    = "3.1.3"
 
-val CatsVersion          = "2.9.0"
-val CirceVersionV0_14    = "0.14.3"
-val PureConfigV0_17      = "0.17.1"
-val ScalaTestVersion     = "3.2.14"
-val ScalaTestPlusVersion = "3.2.14.0"
-val Shapeless2xVersion   = "2.3.9"
-val Shapeless3xVersion   = "3.2.0"
+val CatsVersion        = "2.10.0"
+val CirceVersionV0_14  = "0.14.3"
+val PureConfigV0_17    = "0.17.1"
+val Shapeless2xVersion = "2.3.9"
+val Shapeless3xVersion = "3.2.0"
 
 // ---------------------------------------------------------------------------
 
@@ -101,7 +99,7 @@ lazy val sharedSettings = Seq(
 
   Test / logBuffered := false,
   IntegrationTest / logBuffered := false,
-    
+
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
 
@@ -205,7 +203,7 @@ def defaultCrossProjectConfiguration(
 
   platforms.foldLeft(cross) { (acc, p) =>
     p match {
-      case JSPlatform =>  
+      case JSPlatform =>
         acc.jsSettings(sharedJavascriptSettings)
       case _ =>
         acc.jvmSettings(sharedJVMSettings)
@@ -367,7 +365,7 @@ def integrationSharedSettings(other: Setting[_]*) =
   other ++ Seq(
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
-    ),  
+    ),
   ) ++ Seq(Compile, Test).map { sc =>
     (sc / unmanagedSourceDirectories) ++= {
       val base = baseDirectory.value
@@ -404,7 +402,7 @@ lazy val integrationCatsV2JVM = integrationCatsV2.jvm
 lazy val integrationCatsV2JS  = integrationCatsV2.js
 
 // ---
-def circeSharedSettings(ver: String) = 
+def circeSharedSettings(ver: String) =
   integrationSharedSettings(
     libraryDependencies ++= Seq(
       // https://circe.github.io/circe/
@@ -427,11 +425,11 @@ lazy val integrationCirceV014JVM = integrationCirceV014.jvm
 lazy val integrationCirceV014JS  = integrationCirceV014.js
 
 // -----
-def pureConfigSharedSettings(ver: String) = 
+def pureConfigSharedSettings(ver: String) =
   integrationSharedSettings(
     libraryDependencies ++= Seq(
       "com.github.pureconfig" %%% "pureconfig-core" % ver,
-    ),  
+    ),
   )
 
 lazy val integrationPureConfigV017 = crossProject(JVMPlatform)
