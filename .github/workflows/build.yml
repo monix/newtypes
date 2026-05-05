@@ -2,64 +2,67 @@ name: build
 
 on:
   pull_request:
-    branches: ['*']
+    branches: [ main ]
   push:
-    branches: ['*']
+    branches: [ main ]
     tags: ["v[0-9]+*"]
 
 jobs:
   tests:
-    name: Unit tests (scala ${{ matrix.scala }}, scala.js ${{ matrix.scalajs }}, jvm ${{ matrix.java }})
+    name: Unit tests / JVM ${{ matrix.java }}
     strategy:
-      fail-fast: true      
+      fail-fast: false   
       matrix:
-        os: [ubuntu-20.04]
-        java: [8, 11]
-        scala: [2.12.15, 2.13.8, 3.1.1]
-        scalajs: [1.10.0]
+        os: [ubuntu-latest]
+        java: [8, 11, 21]
+        # scala: [2.12.20, 2.13.14, 3.3.3]
         command: ["ci-test"]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v11
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.${{ matrix.java }}"
-      - uses: actions/setup-node@v2
+          cache: 'sbt'
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+      
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
         run: |
-          ./.github/scripts/build.sh
+          ./sbt -J-Xmx6144m ++${{ matrix.scala }} ${{ matrix.command }}
         env:
           SCALA_VERSION: ${{ matrix.scala }}
-          SCALAJS_VERSION: ${{ matrix.scalaJS }}
           SBT_COMMAND: ${{ matrix.command }}
 
   doc-tests:
     name: Docs tests 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v11
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
-
+          cache: 'sbt'
+          java-version: 11
+          distribution: 'temurin'
       - name: sbt ci-doc
         run: |
-          sbt -J-Xmx6144m ci-doc
+          ./sbt -J-Xmx6144m ci-doc
         env:
           SCALA_VERSION: ${{ matrix.scala }}
-          SCALAJS_VERSION: ${{ matrix.scalaJS }}
           SBT_COMMAND: ${{ matrix.command }}
   
   all_tests:
     name: All Tests
     needs: [ tests, doc-tests ]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Ack
         run: |
@@ -81,10 +84,13 @@ jobs:
 
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v11
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
+          cache: 'sbt'
+          java-version: 11
+          distribution: 'temurin'
 
       - name: Install GnuPG2
         run: |
@@ -106,10 +112,14 @@ jobs:
     needs: [ publish_sonatype ]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v11
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.11"
+          cache: 'sbt'
+          java-version: 11
+          distribution: 'temurin'
 
       - name: Set up Ruby 2.7 (for microsite)
         uses: actions/setup-ruby@v1

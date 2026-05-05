@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 the Newtypes contributors.
+ * Copyright (c) 2021-2024 Alexandru Nedelcu.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +17,10 @@
 
 package monix.newtypes
 
-import scala.annotation.nowarn
-
 private[newtypes] object Platform {
   def getPackageName(cls: Class[_]): String =
     cls.getName.replaceAll("^(.*?)\\.[^.]+$", "$1")
 
-  def getTypeParamsCount(@nowarn cls: Class[_]): Int =
+  def getTypeParamsCount(cls: Class[_]): Int =
     0
 }

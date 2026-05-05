@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 the Newtypes contributors.
+ * Copyright (c) 2021-2024 Alexandru Nedelcu.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,8 +115,8 @@ private[newtypes] sealed trait TypeInfoLevel0 {
       TypeInfo[T](typeName = name, typeLabel = name, packageName = "scala", typeParams = Nil)
 
     val c = tag.runtimeClass
-    c.getSimpleName match {
-      case "int" => primitive("Int")
+    c.getSimpleName.toLowerCase().replaceAll("^primitive", "") match {
+      case "int"  => primitive("Int")
       case "long" => primitive("Long")
       case "short" => primitive("Short")
       case "byte" => primitive("Byte")

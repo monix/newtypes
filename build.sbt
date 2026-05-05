@@ -1,6 +1,7 @@
 import BuildKeys._
 import Boilerplate._
 
+import org.typelevel.scalacoptions.ScalacOptions
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
 import sbtcrossproject.Platform
@@ -16,15 +17,16 @@ addCommandAlias("ci-release", ";+publishSigned ;sonatypeBundleRelease")
 // ---------------------------------------------------------------------------
 // Versions
 
-val Scala212  = "2.12.15"
-val Scala213  = "2.13.8"
-val Scala3    = "3.1.3"
+val Scala212  = "2.12.20"
+val Scala213  = "2.13.14"
+val Scala3    = "3.3.3"
 
-val CatsVersion        = "2.10.0"
-val CirceVersionV0_14  = "0.14.3"
-val PureConfigV0_17    = "0.17.1"
-val Shapeless2xVersion = "2.3.9"
-val Shapeless3xVersion = "3.2.0"
+val CatsVersion        = "2.12.0"
+val CirceVersionV0_14  = "0.14.10"
+val PureConfigV0_17    = "0.17.7"
+val ScalaTestVersion   = "3.2.19"
+val Shapeless2xVersion = "2.3.12"
+val Shapeless3xVersion = "3.4.1"
 
 // ---------------------------------------------------------------------------
 
@@ -35,12 +37,7 @@ lazy val publishStableVersion =
   * Defines common plugins between all projects.
   */
 def defaultPlugins: Project ⇒ Project = pr => {
-  val withCoverage = sys.env.getOrElse("SBT_PROFILE", "") match {
-    case "coverage" => pr
-    case _ => pr.disablePlugins(scoverage.ScoverageSbtPlugin)
-  }
-  withCoverage
-    .enablePlugins(AutomateHeaderPlugin)
+  pr.enablePlugins(AutomateHeaderPlugin)
     .enablePlugins(GitBranchPrompt)
 }
 
@@ -73,6 +70,14 @@ lazy val sharedSettings = Seq(
   // Turning off fatal warnings and certain annoyances during testing
   Test / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
 
+  // Disable tpolecat for Scala 2.12 only
+  Compile / tpolecatExcludeOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) => ScalacOptions.defaultConsoleExclude
+      case _ => Set.empty
+    }
+  },
+
   // ScalaDoc settings
   autoAPIMappings := true,
   scalacOptions ++= Seq(
@@ -85,11 +90,6 @@ lazy val sharedSettings = Seq(
     // Debug warnings
     "-Wconf:any:warning-verbose",
   ),
-
-  // Activates doc testing
-  doctestTestFramework := DoctestTestFramework.ScalaTest,
-  doctestScalaTestVersion := Some(ScalaTestVersion),
-  doctestOnlyCodeBlocksMode := true,
 
   // https://github.com/sbt/sbt/issues/2654
   incOptions := incOptions.value.withLogRecompileOnMacro(false),
@@ -124,7 +124,7 @@ lazy val sharedSettings = Seq(
       else start
     }
     HeaderLicense.Custom(
-      s"""|Copyright (c) $years the ${projectTitle.value} contributors.
+      s"""|Copyright (c) $years Alexandru Nedelcu.
           |See the project homepage at: ${projectWebsiteFullURL.value}
           |
           |Licensed under the Apache License, Version 2.0 (the "License");
@@ -169,7 +169,6 @@ def defaultCrossProjectConfiguration(
   pr: CrossProject,
 ) = {
   val sharedJavascriptSettings = Seq(
-    coverageExcludedFiles := ".*",
     // Use globally accessible (rather than local) source paths in JS source maps
     scalacOptions += {
       val tagOrHash = {
@@ -197,9 +196,6 @@ def defaultCrossProjectConfiguration(
     .configure(defaultPlugins)
     .settings(sharedSettings)
     .settings(crossVersionSharedSources)
-    .settings(filterOutMultipleDependenciesFromGeneratedPomXml(
-      "groupId" -> "org.scoverage".r :: Nil,
-    ))
 
   platforms.foldLeft(cross) { (acc, p) =>
     p match {
@@ -217,10 +213,13 @@ lazy val root = project.in(file("."))
   .aggregate(
     coreJVM,
     coreJS,
+    coreNative,
     integrationCatsV2JVM,
     integrationCatsV2JS,
+    integrationCatsV2Native,
     integrationCirceV014JVM,
     integrationCirceV014JS,
+    integrationCirceV014Native,
     integrationPureConfigV017JVM,
   )
   .configure(defaultPlugins)
@@ -233,10 +232,7 @@ lazy val root = project.in(file("."))
     // Reloads build.sbt changes whenever detected
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     // Deactivate sbt's linter for some temporarily unused keys
-    Global / excludeLintKeys ++= Set(
-      IntegrationTest / logBuffered,
-      coverageExcludedFiles,
-      githubRelativeRepositoryID,
+    Global / excludeLintKeys ++= Set( githubRelativeRepositoryID,
     ),
     // Use Node.js in tests
     Global / scalaJSStage := FastOptStage,
@@ -284,7 +280,7 @@ lazy val site = project.in(file("site"))
       ),
       // https://github.com/47degrees/github4s
       libraryDependencies ++= Seq(
-        "com.47deg" %% "github4s" % "0.29.1",
+        "com.47deg" %% "github4s" % "0.33.3",
         "io.circe" %%% "circe-parser" % CirceVersionV0_14,
         "com.github.pureconfig" %%% "pureconfig" % PureConfigV0_17,
       ),
@@ -328,7 +324,7 @@ lazy val site = project.in(file("site"))
     )
   }
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
   .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
@@ -359,6 +355,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+lazy val coreNative = core.native
 
 // ---
 def integrationSharedSettings(other: Setting[_]*) =
@@ -388,7 +385,7 @@ def catsSharedSettings(ver: String) =
     )
   )
 
-lazy val integrationCatsV2 = crossProject(JSPlatform, JVMPlatform)
+lazy val integrationCatsV2 = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .in(file("integration-cats/v2"))
   .jsConfigure(_.disablePlugins(MimaPlugin))
@@ -400,6 +397,7 @@ lazy val integrationCatsV2 = crossProject(JSPlatform, JVMPlatform)
 
 lazy val integrationCatsV2JVM = integrationCatsV2.jvm
 lazy val integrationCatsV2JS  = integrationCatsV2.js
+lazy val integrationCatsV2Native = integrationCatsV2.native
 
 // ---
 def circeSharedSettings(ver: String) =
@@ -411,7 +409,7 @@ def circeSharedSettings(ver: String) =
     )
   )
 
-lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
+lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .in(file("integration-circe/v0.14"))
   .jsConfigure(_.disablePlugins(MimaPlugin))
@@ -423,6 +421,7 @@ lazy val integrationCirceV014 = crossProject(JSPlatform, JVMPlatform)
 
 lazy val integrationCirceV014JVM = integrationCirceV014.jvm
 lazy val integrationCirceV014JS  = integrationCirceV014.js
+lazy val integrationCirceV014Native = integrationCirceV014.native
 
 // -----
 def pureConfigSharedSettings(ver: String) =

@@ -17,6 +17,11 @@
 
 package monix.newtypes
 
-object TestUtils {
-  val illTyped = shapeless.test.illTyped
+private[newtypes] object Platform {
+  def getPackageName(cls: Class[_]): String =
+    cls.getName.replaceAll("^(.*?)\\.[^.]+$", "$1")
+
+  def getTypeParamsCount(cls: Class[_]): Int =
+    0
 }
+
