@@ -75,7 +75,9 @@ lazy val sharedSettings = Seq(
   versionScheme := Some("early-semver"),
 
   libraryDependencySchemes ++= Seq(
-    "org.scala-native" % "test-interface_native0.5_3" % "early-semver"
+    "org.scala-native" % "test-interface_native0.5_3" % "early-semver",
+    "org.scala-native" % "test-interface_native0.5_2.13" % "early-semver",
+    "org.scala-native" % "test-interface_native0.5_2.12" % "early-semver",
   ),
 
   // Turning off fatal warnings for doc generation
