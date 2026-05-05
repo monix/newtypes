@@ -8,7 +8,7 @@ Importing the [Cats](https://github.com/typelevel/cats) integration:
 
 ```scala
 // For Cats version 2.x.x
-libraryDependencies += "io.monix" %% "newtypes-cats-v2" % "@VERSION@"
+libraryDependencies += "io.monix" %% "newtypes-cats-v2" % "{{ projectVersion }}"
 ```
 
 Usage:
@@ -20,9 +20,9 @@ import monix.newtypes.integrations.DerivedCatsInstances
 type Email = Email.Type
 object Email extends NewtypeValidated[String] with DerivedCatsInstances {
   def apply(v: String): Either[BuildFailure[Type], Type] =
-    if (v.contains("@")) 
+    if (v.contains("@"))
       Right(unsafeCoerce(v))
-    else 
+    else
       Left(BuildFailure("missing @"))
 }
 ```

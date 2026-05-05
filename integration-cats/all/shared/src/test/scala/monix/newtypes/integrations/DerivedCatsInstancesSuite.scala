@@ -59,12 +59,12 @@ class DerivedCatsInstancesSuite extends FunSuite {
   }
 
   test("an instance of Order exists") {
-    assert(SomeNewtype.catsOrder[SomeNewtype, Internal].isInstanceOf[Order[_]])
+    implicitly[Order[SomeNewtype]]
   }
   test("the Order instances produce the same result") {
     testPairs.foreach { case (x, y) =>
       assertEquals(
-        SomeNewtype.catsOrder[SomeNewtype, Internal].compare(SomeNewtype(x), SomeNewtype(y)),
+        implicitly[Order[SomeNewtype]].compare(SomeNewtype(x), SomeNewtype(y)),
         x.compare(y)
       )
     }

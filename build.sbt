@@ -114,7 +114,6 @@ lazy val sharedSettings = Seq(
   // Options for testing
 
   Test / logBuffered := false,
-  IntegrationTest / logBuffered := false,
 
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
@@ -242,7 +241,7 @@ lazy val root = project.in(file("."))
   .configure(defaultPlugins)
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
-  .settings(unidocSettings(coreJVM, integrationCirceV014JVM, integrationPureConfigV017JVM))
+  .settings(unidocSettings(coreJVM, integrationCatsV2JVM, integrationCirceV014JVM, integrationPureConfigV017JVM))
   .settings(
     ScalaUnidoc / unidoc / scalacOptions ++= Seq(
       "-siteroot",

@@ -20,29 +20,27 @@ package integrations
 
 import cats.{Eq, Hash, Order, Show}
 
-trait DerivedCatsInstances extends DerivedCatsEq with DerivedCatsHash with DerivedCatsOrder with DerivedCatsShow
+trait DerivedCatsInstances extends LowPriorityDerivedCatsInstances {
+  implicit def catsOrder[T, S](implicit extractor: HasExtractor.Aux[T, S], orderS: Order[S]): Order[T] =
+    new Order[T] {
+      override def compare(x: T, y: T): Int = orderS.compare(extractor.extract(x), extractor.extract(y))
+    }
 
-trait DerivedCatsEq {
-  implicit def catsEq[T, S](implicit extractor: HasExtractor.Aux[T, S], eqs: Eq[S]): Eq[T] = new Eq[T] {
-    override def eqv(x: T, y: T): Boolean = eqs.eqv(extractor.extract(x), extractor.extract(y))
-  }
+  implicit def catsShow[T, S](implicit extractor: HasExtractor.Aux[T, S], showS: Show[S]): Show[T] =
+    new Show[T] {
+      override def show(t: T): String = showS.show(extractor.extract(t))
+    }
 }
 
-trait DerivedCatsHash { self: DerivedCatsEq =>
-  implicit def catsHash[T, S](implicit extractor: HasExtractor.Aux[T, S], hashS: Hash[S]): Hash[T] = new Hash[T] {
-    override def eqv(x: T, y: T): Boolean = self.catsEq.eqv(x, y)
-    override def hash(x: T): Int          = hashS.hash(extractor.extract(x))
-  }
-}
+private[integrations] trait LowPriorityDerivedCatsInstances {
+  implicit def catsEq[T, S](implicit extractor: HasExtractor.Aux[T, S], eqS: Eq[S]): Eq[T] =
+    new Eq[T] {
+      override def eqv(x: T, y: T): Boolean = eqS.eqv(extractor.extract(x), extractor.extract(y))
+    }
 
-trait DerivedCatsOrder {
-  def catsOrder[T, S](implicit extractor: HasExtractor.Aux[T, S], orderS: Order[S]): Order[T] = new Order[T] {
-    override def compare(x: T, y: T): Int = orderS.compare(extractor.extract(x), extractor.extract(y))
-  }
-}
-
-trait DerivedCatsShow {
-  implicit def catsShow[T, S](implicit extractor: HasExtractor.Aux[T, S], showS: Show[S]): Show[T] = new Show[T] {
-    override def show(t: T): String = showS.show(extractor.extract(t))
-  }
+  implicit def catsHash[T, S](implicit extractor: HasExtractor.Aux[T, S], hashS: Hash[S]): Hash[T] =
+    new Hash[T] {
+      override def eqv(x: T, y: T): Boolean = hashS.eqv(extractor.extract(x), extractor.extract(y))
+      override def hash(x: T): Int          = hashS.hash(extractor.extract(x))
+    }
 }
