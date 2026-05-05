@@ -1,5 +1,4 @@
 ---
-layout: docs
 title:  "Integration with Cats typeclasses (Eq, Show, Hash, Order)"
 ---
 
