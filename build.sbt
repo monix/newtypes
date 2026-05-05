@@ -23,7 +23,6 @@ val Shapeless3xVersion = "3.4.1"
 
 def munitTestDependency = Def.setting {
   "org.scalameta" %%% "munit" % MUnitVersion % Test
-    // .exclude("org.scala-native", s"test-interface_native0.5_${scalaBinaryVersion.value}")
 }
 
 // ---------------------------------------------------------------------------
