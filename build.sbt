@@ -336,7 +336,6 @@ lazy val integrationCatsV2 = crossProject(JSPlatform, JVMPlatform, NativePlatfor
   .dependsOn(core)
   .settings(catsSharedSettings(CatsVersion))
   .settings(name := "newtypes-cats-v2")
-  .jvmSettings(mimaSettings("newtypes-cats-v2"))
 
 lazy val integrationCatsV2JVM = integrationCatsV2.jvm
 lazy val integrationCatsV2JS  = integrationCatsV2.js
