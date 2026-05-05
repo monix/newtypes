@@ -17,9 +17,9 @@
 
 package monix.newtypes
 
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 
-class BuildFailureSuite extends AnyFunSuite {
+class BuildFailureSuite extends FunSuite {
   test("toReadableString") {
     val bf = BuildFailure[List[String]]("empty list")
     assert(bf.toReadableString == "Invalid List[String] — empty list")

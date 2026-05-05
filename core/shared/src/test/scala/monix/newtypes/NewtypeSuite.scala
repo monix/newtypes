@@ -18,10 +18,10 @@
 package monix.newtypes
 
 import cats.Eq
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 import monix.newtypes.TestUtils.illTyped
 
-class NewtypeSuite extends AnyFunSuite {
+class NewtypeSuite extends FunSuite {
   import NewtypeSuite._
 
   test("it compiles") {

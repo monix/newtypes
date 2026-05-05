@@ -18,9 +18,9 @@
 package monix.newtypes
 package integrations
 
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 
-class NewtypeKCirceEncoderSuite extends AnyFunSuite {
+class NewtypeKCirceEncoderSuite extends FunSuite {
   import NewtypeKCirceCodecSuite._
 
   test("NewtypeK with DerivedPureConfigConvert") {

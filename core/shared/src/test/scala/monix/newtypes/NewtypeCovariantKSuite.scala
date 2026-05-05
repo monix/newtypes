@@ -19,10 +19,10 @@ package monix.newtypes
 
 import cats.implicits._
 import cats.{Eq, Monad, Traverse}
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 import monix.newtypes.TestUtils.illTyped
 
-class NewtypeCovariantKSuite extends AnyFunSuite {
+class NewtypeCovariantKSuite extends FunSuite {
   import NewtypeCovariantKSuite._
 
   test("it compiles") {

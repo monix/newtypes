@@ -20,9 +20,9 @@ package integrations
 
 import io.circe.syntax._
 import io.circe.parser
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 
-class NewtypeCirceCodecSuite extends AnyFunSuite {
+class NewtypeCirceCodecSuite extends FunSuite {
   import NewtypeCirceCodecSuite._
 
   test("NewtypeWrapped has JSON codec") {

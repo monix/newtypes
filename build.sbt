@@ -17,9 +17,14 @@ val Scala3    = "3.3.7"
 val CatsVersion        = "2.13.0"
 val CirceVersionV0_14  = "0.14.15"
 val PureConfigV0_17    = "0.17.8"
-val ScalaTestVersion   = "3.2.20"
+val MUnitVersion       = "1.2.4"
 val Shapeless2xVersion = "2.3.12"
 val Shapeless3xVersion = "3.4.1"
+
+def munitTestDependency = Def.setting {
+  ("org.scalameta" %%% "munit" % MUnitVersion % Test)
+    .exclude("org.scala-native", s"test-interface_native0.5_${scalaBinaryVersion.value}")
+}
 
 // ---------------------------------------------------------------------------
 // Commands
@@ -265,8 +270,8 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     libraryDependencies ++= Seq(
       // https://typelevel.org/cats/
       "org.typelevel" %%% "cats-core" % CatsVersion % Test,
-      // https://github.com/scalatest/scalatest
-      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+      // https://scalameta.org/munit/
+      munitTestDependency.value,
     ),
     // Version specific dependencies
     libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -291,7 +296,7 @@ lazy val coreNative = core.native
 def integrationSharedSettings(other: Setting[_]*) =
   other ++ Seq(
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+      munitTestDependency.value,
     ),
   ) ++ Seq(Compile, Test).map { sc =>
     (sc / unmanagedSourceDirectories) ++= {
