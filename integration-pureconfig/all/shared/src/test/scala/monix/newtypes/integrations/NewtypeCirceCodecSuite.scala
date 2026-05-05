@@ -18,9 +18,9 @@
 package monix.newtypes
 package integrations
 
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 
-class NewtypePureConfigCodecSuite extends AnyFunSuite {
+class NewtypePureConfigCodecSuite extends FunSuite {
   import NewtypeCirceCodecSuite._
 
   test("NewtypeWrapped has JSON codec") {

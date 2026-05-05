@@ -17,22 +17,22 @@
 
 package monix.newtypes
 
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 import monix.newtypes.TestUtils.illTyped
 
-class NewtypeValidatedSuite extends AnyFunSuite {
+class NewtypeValidatedSuite extends FunSuite {
   import NewtypeValidatedSuite._
 
   test("validation") {
     EmailAddress("noreply@alexn.org") match {
       case Right(ref @ EmailAddress(str)) =>
-        assert(ref === EmailAddress.unsafe("noreply@alexn.org"))
-        assert(str === "noreply@alexn.org")
+        assertEquals(ref, EmailAddress.unsafe("noreply@alexn.org"))
+        assertEquals(str, "noreply@alexn.org")
       case other =>
         fail(s"Unexpected match: $other")
     }
     EmailAddress("not a valid email") match {
-      case Left(BuildFailure(_, _)) => succeed
+      case Left(BuildFailure(_, _)) => ()
       case other => fail(s"Unexpected value: $other")
     }
   }
@@ -41,8 +41,8 @@ class NewtypeValidatedSuite extends AnyFunSuite {
     val ea1 = EmailAddress.unsafe("noreply@alexn.org")
     ea1 match {
       case ref @ EmailAddress(v) =>
-        assert(ref === ea1)
-        assert(v === ea1)
+        assertEquals(ref, ea1)
+        assertEquals[Any, Any](v, ea1)
     }
 
     illTyped(

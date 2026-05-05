@@ -18,10 +18,10 @@
 package monix.newtypes
 
 import cats.Eq
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 import monix.newtypes.TestUtils.illTyped
 
-class NewtypeWrappedSuite extends AnyFunSuite {
+class NewtypeWrappedSuite extends FunSuite {
   import NewtypeWrappedSuite._
 
   test("it compiles") {
@@ -50,8 +50,8 @@ class NewtypeWrappedSuite extends AnyFunSuite {
     val n = MyName("Alex")
     n match {
       case ref @ MyName(src) =>
-        assert(ref === n)
-        assert(src === n.value)
+        assertEquals(ref, n)
+        assertEquals(src, n.value)
     }
 
     illTyped(
