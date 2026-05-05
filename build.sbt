@@ -22,8 +22,8 @@ val Shapeless2xVersion = "2.3.12"
 val Shapeless3xVersion = "3.4.1"
 
 def munitTestDependency = Def.setting {
-  ("org.scalameta" %%% "munit" % MUnitVersion % Test)
-    .exclude("org.scala-native", s"test-interface_native0.5_${scalaBinaryVersion.value}")
+  "org.scalameta" %%% "munit" % MUnitVersion % Test
+    // .exclude("org.scala-native", s"test-interface_native0.5_${scalaBinaryVersion.value}")
 }
 
 // ---------------------------------------------------------------------------
@@ -34,8 +34,8 @@ addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;
 addCommandAlias("ci-doc",      s";project root ;++$Scala3! ;clean ;unidoc")
 addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
 addCommandAlias("ci-release",  ";+publishSigned ;sonatypeBundleRelease")
-addCommandAlias( 
-  "ci-publish-local", 
+addCommandAlias(
+  "ci-publish-local",
   "+publishLocalSigned"
 )
 
@@ -74,6 +74,10 @@ lazy val sharedSettings = Seq(
 
   // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
   versionScheme := Some("early-semver"),
+
+  libraryDependencySchemes ++= Seq(
+    "org.scala-native" % "test-interface_native0.5_3" % "early-semver"
+  ),
 
   // Turning off fatal warnings for doc generation
   Compile / doc / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
