@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 the Newtypes contributors.
+ * Copyright (c) 2021-2026 Alexandru Nedelcu.
  * See the project homepage at: https://newtypes.monix.io/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,20 +20,23 @@ package integrations
 
 import cats.{Eq, Hash, Order, Show}
 import cats.syntax.all._
+import munit.FunSuite
 import monix.newtypes.NewtypeWrapped
 import monix.newtypes.integrations.DerivedCatsInstancesSuite._
-import org.scalacheck.Prop._
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class DerivedCatsInstancesSuite extends AnyFunSuite with ScalaCheckPropertyChecks {
+class DerivedCatsInstancesSuite extends FunSuite {
+  private val testValues: List[Internal] = List("", "value", "another value")
+  private val testPairs: List[(Internal, Internal)] = for {
+    x <- testValues
+    y <- testValues
+  } yield (x, y)
 
   test("an instance of Eq exists") {
     implicitly[Eq[SomeNewtype]]
   }
   test("the Eq instances produce the same result") {
-    forAll { (x: Internal, y: Internal) =>
-      x.eqv(y) == SomeNewtype(x).eqv(SomeNewtype(y))
+    testPairs.foreach { case (x, y) =>
+      assertEquals(SomeNewtype(x).eqv(SomeNewtype(y)), x.eqv(y))
     }
   }
 
@@ -41,8 +44,8 @@ class DerivedCatsInstancesSuite extends AnyFunSuite with ScalaCheckPropertyCheck
     implicitly[Hash[SomeNewtype]]
   }
   test("the Hash instances produce the same result") {
-    forAll { (x: Internal) =>
-      x.hash == SomeNewtype(x).hash
+    testValues.foreach { x =>
+      assertEquals(SomeNewtype(x).hash, x.hash)
     }
   }
 
@@ -50,8 +53,8 @@ class DerivedCatsInstancesSuite extends AnyFunSuite with ScalaCheckPropertyCheck
     implicitly[Show[SomeNewtype]]
   }
   test("the Show instances produce the same result") {
-    forAll { (x: Internal) =>
-      x.show == SomeNewtype(x).show
+    testValues.foreach { x =>
+      assertEquals(SomeNewtype(x).show, x.show)
     }
   }
 
@@ -59,8 +62,11 @@ class DerivedCatsInstancesSuite extends AnyFunSuite with ScalaCheckPropertyCheck
     assert(SomeNewtype.catsOrder[SomeNewtype, Internal].isInstanceOf[Order[_]])
   }
   test("the Order instances produce the same result") {
-    forAll { (x: Internal, y: Internal) =>
-      x.compare(y) == SomeNewtype.catsOrder[SomeNewtype, Internal].compare(SomeNewtype(x), SomeNewtype(y))
+    testPairs.foreach { case (x, y) =>
+      assertEquals(
+        SomeNewtype.catsOrder[SomeNewtype, Internal].compare(SomeNewtype(x), SomeNewtype(y)),
+        x.compare(y)
+      )
     }
   }
 }

@@ -324,8 +324,7 @@ def integrationSharedSettings(other: Setting[_]*) =
 def catsSharedSettings(ver: String) =
   integrationSharedSettings(
     libraryDependencies ++= Seq(
-      "org.typelevel"     %%% "cats-core"       % ver,
-      "org.scalatestplus" %%% "scalacheck-1-17" % ScalaTestPlusVersion % Test,
+      "org.typelevel" %%% "cats-core" % ver,
     )
   )
 
