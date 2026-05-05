@@ -227,18 +227,21 @@ lazy val root = project.in(file("."))
   .enablePlugins(ScalaUnidocPlugin)
   .disablePlugins(MimaPlugin)
   .aggregate(
-    coreJS,
     coreJVM,
+    coreJS,
     coreNative,
-    integrationCirceV014JS,
+    integrationCatsV2JVM,
+    integrationCatsV2JS,
+    integrationCatsV2Native,
     integrationCirceV014JVM,
+    integrationCirceV014JS,
     integrationCirceV014Native,
     integrationPureConfigV017JVM,
   )
   .configure(defaultPlugins)
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
-  .settings(unidocSettings(coreJVM, integrationCirceV014JVM, integrationPureConfigV017JVM))
+  .settings(unidocSettings(coreJVM, integrationCatsV2JVM, integrationCirceV014JVM, integrationPureConfigV017JVM))
   .settings(
     ScalaUnidoc / unidoc / scalacOptions ++= Seq(
       "-siteroot",
@@ -316,6 +319,28 @@ def integrationSharedSettings(other: Setting[_]*) =
     }
   }
 
+// ---
+def catsSharedSettings(ver: String) =
+  integrationSharedSettings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "cats-core" % ver,
+    )
+  )
+
+lazy val integrationCatsV2 = crossProject(JSPlatform, JVMPlatform, NativePlatform)
+  .crossType(CrossType.Full)
+  .in(file("integration-cats/v2"))
+  .jsConfigure(_.disablePlugins(MimaPlugin))
+  .configureCross(defaultCrossProjectConfiguration(JSPlatform, JVMPlatform))
+  .dependsOn(core)
+  .settings(catsSharedSettings(CatsVersion))
+  .settings(name := "newtypes-cats-v2")
+
+lazy val integrationCatsV2JVM = integrationCatsV2.jvm
+lazy val integrationCatsV2JS  = integrationCatsV2.js
+lazy val integrationCatsV2Native = integrationCatsV2.native
+
+// ---
 def circeSharedSettings(ver: String) =
   integrationSharedSettings(
     libraryDependencies ++= Seq(
