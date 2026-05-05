@@ -21,9 +21,9 @@ package integrations
 import io.circe.{ Encoder, Decoder }
 import io.circe.syntax._
 import io.circe.parser
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 
-class NewsubtypeCirceCodecSuite extends AnyFunSuite {
+class NewsubtypeCirceCodecSuite extends FunSuite {
   import NewsubtypeCirceCodecSuite._
 
   test("NewsubtypeWrapped[String] with DerivedCirceEncoder") {

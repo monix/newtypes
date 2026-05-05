@@ -18,12 +18,12 @@
 package monix.newtypes
 package integrations
 
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 import io.circe.{ Encoder, Decoder }
 import io.circe.parser.parse
 import io.circe.syntax._
 
-class NewtypeKCirceEncoderSuite extends AnyFunSuite {
+class NewtypeKCirceEncoderSuite extends FunSuite {
   import NewtypeKCirceCodecSuite._
 
   test("NewtypeK with DerivedCirceEncoder") {

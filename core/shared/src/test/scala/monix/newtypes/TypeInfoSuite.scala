@@ -17,9 +17,9 @@
 
 package monix.newtypes
 
-import org.scalatest.funsuite.AnyFunSuite
+import munit.FunSuite
 
-class TypeInfoSuite extends AnyFunSuite {
+class TypeInfoSuite extends FunSuite {
   def x = 1
   class Foo { def foo = x }
 

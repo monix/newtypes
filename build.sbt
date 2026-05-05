@@ -17,9 +17,13 @@ val Scala3    = "3.3.7"
 val CatsVersion        = "2.13.0"
 val CirceVersionV0_14  = "0.14.15"
 val PureConfigV0_17    = "0.17.8"
-val ScalaTestVersion   = "3.2.20"
+val MUnitVersion       = "1.2.4"
 val Shapeless2xVersion = "2.3.12"
 val Shapeless3xVersion = "3.4.1"
+
+def munitTestDependency = Def.setting {
+  "org.scalameta" %%% "munit" % MUnitVersion % Test
+}
 
 // ---------------------------------------------------------------------------
 // Commands
@@ -29,8 +33,8 @@ addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;
 addCommandAlias("ci-doc",      s";project root ;++$Scala3! ;clean ;unidoc")
 addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
 addCommandAlias("ci-release",  ";+publishSigned ;sonatypeBundleRelease")
-addCommandAlias( 
-  "ci-publish-local", 
+addCommandAlias(
+  "ci-publish-local",
   "+publishLocalSigned"
 )
 
@@ -69,6 +73,12 @@ lazy val sharedSettings = Seq(
 
   // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
   versionScheme := Some("early-semver"),
+
+  libraryDependencySchemes ++= Seq(
+    "org.scala-native" % "test-interface_native0.5_3" % "early-semver",
+    "org.scala-native" % "test-interface_native0.5_2.13" % "early-semver",
+    "org.scala-native" % "test-interface_native0.5_2.12" % "early-semver",
+  ),
 
   // Turning off fatal warnings for doc generation
   Compile / doc / tpolecatExcludeOptions ++= ScalacOptions.defaultConsoleExclude,
@@ -269,8 +279,8 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     libraryDependencies ++= Seq(
       // https://typelevel.org/cats/
       "org.typelevel" %%% "cats-core" % CatsVersion % Test,
-      // https://github.com/scalatest/scalatest
-      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+      // https://scalameta.org/munit/
+      munitTestDependency.value,
     ),
     // Version specific dependencies
     libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -295,7 +305,7 @@ lazy val coreNative = core.native
 def integrationSharedSettings(other: Setting[_]*) =
   other ++ Seq(
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % ScalaTestVersion % Test,
+      munitTestDependency.value,
     ),
   ) ++ Seq(Compile, Test).map { sc =>
     (sc / unmanagedSourceDirectories) ++= {
