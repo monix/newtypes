@@ -1,5 +1,9 @@
 RUBY_VERSION := $(shell cat "./site/.ruby-version")
 
+.PHONY: check-all
+check-all:
+	./sbt ci
+
 build-microsite:
 	rbenv install -s "$(RUBY_VERSION)"
 	ln -sf "./site/.ruby-version" "./.ruby-version"
