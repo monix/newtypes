@@ -7,6 +7,7 @@ module.exports = {
   requireConfig: "optional",
   recreateWhen: "always",
   prHourlyLimit: 0,
+  separateMajorMinor: false,
 
   extends: [":dependencyDashboard"],
 
@@ -35,6 +36,12 @@ module.exports = {
       matchManagers: ["sbt"],
       matchPackageNames: ["org.scala-lang:scala3-library_3"],
       allowedVersions: "/^3\\.3\\.\\d+$/",
+    },
+    {
+      description: "Disable updates for libraryDependencySchemes entries (not real versions)",
+      matchManagers: ["sbt"],
+      matchCurrentValue: "/^(early-semver|semver-spec|pvp|always|strict)$/",
+      enabled: false,
     },
     {
       description: "Wait one week before proposing dependency updates",
