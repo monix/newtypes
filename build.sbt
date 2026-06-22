@@ -12,7 +12,7 @@ import xerial.sbt.Sonatype.sonatypeCentralHost
 
 val Scala212  = "2.12.21"
 val Scala213  = "2.13.18"
-val Scala3    = "3.3.7"
+val Scala3    = "3.3.8"
 
 val CatsVersion        = "2.13.0"
 val CirceVersionV0_14  = "0.14.15"
