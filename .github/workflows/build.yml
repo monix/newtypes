@@ -28,7 +28,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
       
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
 
