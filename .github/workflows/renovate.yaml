@@ -15,9 +15,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Create automation token
+        id: automation-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+
       - name: Renovate
         uses: renovatebot/github-action@v46.2.2
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          configurationFile: .github/renovate.json
+          token: ${{ steps.automation-token.outputs.token }}
         # env:
         #   LOG_LEVEL: debug
