@@ -16,7 +16,7 @@ val Scala3    = "3.3.8"
 val CatsVersion        = "2.13.0"
 val CirceVersionV0_14  = "0.14.15"
 val PureConfigV0_17    = "0.17.8"
-val MUnitVersion       = "1.3.3"
+val MUnitVersion       = "1.3.5"
 val Shapeless2xVersion = "2.3.13"
 val Shapeless3xVersion = "3.6.0"
 
