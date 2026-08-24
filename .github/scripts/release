@@ -4,9 +4,52 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.." || exit
 
-git fetch --depth=100 origin +refs/tags/*:refs/tags/*
+: "${PUBLISH_STABLE_VERSION:?PUBLISH_STABLE_VERSION is required}"
+: "${RELEASE_REF:?RELEASE_REF is required}"
 
-echo "GITHUB_REF=$GITHUB_REF"
+project_version=$(./sbt --batch --error 'print ThisBuild / version' | tail -n 1 | xargs)
+if [[ -z "$project_version" ]]; then
+  echo "Could not read the project version from sbt" >&2
+  exit 1
+fi
+
+case "$PUBLISH_STABLE_VERSION" in
+  true | 1 | yes)
+    if [[ "$project_version" == *-SNAPSHOT ]]; then
+      echo "Stable publishing requires a non-SNAPSHOT project version, found $project_version" >&2
+      exit 1
+    fi
+
+    expected_ref="refs/tags/v$project_version"
+    if [[ "$RELEASE_REF" != "$expected_ref" ]]; then
+      echo "Stable publishing for $project_version requires $expected_ref, found $RELEASE_REF" >&2
+      exit 1
+    fi
+
+    git fetch --depth=100 origin +refs/tags/*:refs/tags/*
+    if ! git describe --exact-match --tags --match "v$project_version" HEAD >/dev/null; then
+      echo "Stable publishing requires HEAD to have the v$project_version tag" >&2
+      exit 1
+    fi
+
+    release_command=ci-release
+    ;;
+  false | 0 | no)
+    if [[ "$project_version" != *-SNAPSHOT ]]; then
+      echo "Snapshot publishing requires a -SNAPSHOT project version, found $project_version" >&2
+      exit 1
+    fi
+
+    release_command=ci-snapshot
+    ;;
+  *)
+    echo "PUBLISH_STABLE_VERSION must be true or false" >&2
+    exit 1
+    ;;
+esac
+
+echo "PROJECT_VERSION=$project_version"
+echo "RELEASE_REF=$RELEASE_REF"
 
 : "${PGP_KEY_HEX:?PGP_KEY_HEX is required for signing}"
 : "${PGP_SECRET:?PGP_SECRET is required for signing}"
@@ -16,4 +59,4 @@ echo "GITHUB_REF=$GITHUB_REF"
 
 printf '%s' "$PGP_SECRET" | base64 --decode | gpg --batch --yes --import
 
-./sbt "show version" "ci-release"
+./sbt "show version" "$release_command"

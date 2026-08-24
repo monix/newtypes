@@ -4,17 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       ref_to_publish:
-        description: 'Ref (branch or tag)'
+        description: 'Git ref. Stable releases require refs/tags/vX.Y.Z'
         required: true
+        type: string
         default: 'refs/heads/main'
       stable_version:
-        description: 'Stable version? (true=staging, false=snapshot)'
+        description: 'Stable release (version must not end in -SNAPSHOT)'
         required: true
-        default: "true"
+        type: boolean
+        default: false
 
 jobs:
   publish_sonatype:
-    name: Publish to Sonatype (Request)
+    name: Publish to Maven Central
 
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +42,7 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           PUBLISH_STABLE_VERSION: ${{ github.event.inputs.stable_version }}
-          GITHUB_REF: ${{ github.event.inputs.ref_to_publish }}
+          RELEASE_REF: ${{ github.event.inputs.ref_to_publish }}
 
   publish_docs:
     name: Publish Website
@@ -71,7 +73,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: target/scala-3.3.7/unidoc
+          path: target/scala-3.3.8/unidoc
 
       - name: Deploy to GitHub Pages
         id: deployment
