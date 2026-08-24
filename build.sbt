@@ -5,7 +5,6 @@ import org.typelevel.scalacoptions.ScalacOptions
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
 import sbtcrossproject.Platform
-import xerial.sbt.Sonatype.sonatypeCentralHost
 
 // ---------------------------------------------------------------------------
 // Versions
@@ -32,7 +31,8 @@ addCommandAlias("ci-test-all", "+ci-test")
 addCommandAlias("ci-test",     ";clean;Test/compile;test;mimaReportBinaryIssues;package")
 addCommandAlias("ci-doc",      s";project root ;++$Scala3! ;clean ;unidoc")
 addCommandAlias("ci",          ";project root ;reload ;+ci-test ;ci-doc")
-addCommandAlias("ci-release",  ";+publishSigned ;sonatypeBundleRelease")
+addCommandAlias("ci-release",  ";clean ;+publishSigned ;sonaRelease")
+addCommandAlias("ci-snapshot", ";clean ;+publishSigned")
 addCommandAlias(
   "ci-publish-local",
   "+publishLocalSigned"
@@ -40,16 +40,11 @@ addCommandAlias(
 
 // ---------------------------------------------------------------------------
 
-lazy val publishStableVersion =
-  settingKey[Boolean]("If it should publish stable versions to Sonatype staging repository, instead of a snapshot")
-
 /**
   * Defines common plugins between all projects.
   */
-def defaultPlugins: Project ⇒ Project = pr => {
-  pr.enablePlugins(AutomateHeaderPlugin)
-    .enablePlugins(GitBranchPrompt)
-}
+def defaultPlugins: Project ⇒ Project =
+  _.enablePlugins(AutomateHeaderPlugin)
 
 // The version with which we must keep binary compatibility.
 // https://github.com/typesafehub/migration-manager/wiki/Sbt-plugin
@@ -118,14 +113,13 @@ lazy val sharedSettings = Seq(
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
 
-  ThisBuild / publishTo := sonatypePublishToBundle.value,
-  ThisBuild / isSnapshot := {
-    !isVersionStable.value || !publishStableVersion.value
+  ThisBuild / publishTo := {
+    val centralSnapshots =
+      "https://central.sonatype.com/repository/maven-snapshots/"
+    if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+    else localStaging.value
   },
-  ThisBuild / dynverSonatypeSnapshots := !(isVersionStable.value && publishStableVersion.value),
-  ThisBuild / sonatypeProfileName := organization.value,
-  sonatypeSessionName := s"[sbt-sonatype] ${name.value}-${version.value}",
-
+  publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false }, // removes optional dependencies
 
@@ -171,8 +165,6 @@ lazy val sharedSettings = Seq(
       url=url("https://alexn.org")
     )),
 
-  // -- Settings meant for deployment on Sonatype
-  sonatypeCredentialHost := sonatypeCentralHost,
   usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "")),
 )
 
@@ -187,15 +179,11 @@ def defaultCrossProjectConfiguration(
   val sharedJavascriptSettings = Seq(
     // Use globally accessible (rather than local) source paths in JS source maps
     scalacOptions += {
-      val tagOrHash = {
-        val ver = s"v${version.value}"
-        if (isSnapshot.value)
-          git.gitHeadCommit.value.getOrElse(ver)
-        else
-          ver
-      }
+      val treeRef =
+        if (isSnapshot.value) "main"
+        else s"v${version.value}"
       val l = (LocalRootProject / baseDirectory).value.toURI.toString
-      val g = s"https://raw.githubusercontent.com/${githubFullRepositoryID.value}/$tagOrHash/"
+      val g = s"https://raw.githubusercontent.com/${githubFullRepositoryID.value}/$treeRef/"
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, _)) =>
           s"-P:scalajs:mapSourceURI:$l->$g"
@@ -256,15 +244,9 @@ lazy val root = project.in(file("."))
     // Reloads build.sbt changes whenever detected
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     // Deactivate sbt's linter for some temporarily unused keys
-    Global / excludeLintKeys ++= Set( githubRelativeRepositoryID,
-    ),
+    Global / excludeLintKeys ++= Set(githubRelativeRepositoryID),
     // Use Node.js in tests
     Global / scalaJSStage := FastOptStage,
-    // Used in CI when publishing artifacts to Sonatype
-    Global / publishStableVersion := {
-      sys.env.get("PUBLISH_STABLE_VERSION")
-        .exists(v => v == "true" || v == "1" || v == "yes")
-    },
   )
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)

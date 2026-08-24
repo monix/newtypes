@@ -9,6 +9,8 @@ on:
 jobs:
   renovate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -16,7 +18,6 @@ jobs:
       - name: Renovate
         uses: renovatebot/github-action@v46.2.2
         with:
-          configurationFile: .github/renovate-config.js
           token: ${{ secrets.RENOVATE_TOKEN }}
         # env:
         #   LOG_LEVEL: debug
