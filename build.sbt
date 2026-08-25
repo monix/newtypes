@@ -6,6 +6,9 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import sbtcrossproject.CrossProject
 import sbtcrossproject.Platform
 
+// https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
+ThisBuild / versionScheme := Some("semver-spec")
+
 // ---------------------------------------------------------------------------
 // Versions
 
@@ -65,9 +68,6 @@ lazy val sharedSettings = Seq(
   organization := "io.monix",
   scalaVersion := Scala3,
   crossScalaVersions := Seq(Scala212, Scala213, Scala3),
-
-  // https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html
-  versionScheme := Some("early-semver"),
 
   libraryDependencySchemes ++= Seq(
     "org.scala-native" % "test-interface_native0.5_3" % "early-semver",
